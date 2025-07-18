@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -172,39 +173,66 @@
                             <h3 class="text-xl font-semibold text-gray-800">Dernières transactions</h3>
                             <a href="#" class="text-primary no-underline font-medium py-2 px-4 rounded-2xl transition-all hover:bg-primary hover:bg-opacity-10" onclick="showScreen('transactions')">Voir tout</a>
                         </div>
-                        
-                        <div class="flex justify-between items-center p-4 border-b border-gray-200 transition-all hover:bg-primary hover:bg-opacity-5 hover:rounded-xl">
-                            <div class="flex items-center flex-1">
-                                <div class="text-2xl mr-4 w-10 h-10 rounded-full flex items-center justify-center bg-primary bg-opacity-10 text-primary">📥</div>
-                                <div class="flex-1">
-                                    <div class="font-medium text-gray-800 mb-1">Transfert - Dépôt</div>
-                                    <div class="text-gray-600 text-sm">Aujourd'hui, 14:30</div>
-                                </div>
+                          <div class="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
+                                <?php if (isset($transactions) && !empty($transactions)): ?>
+                                    <?php foreach ($transactions as $index => $transaction): ?>
+                                        <div class="flex justify-between items-center p-4 <?= $index < count($transactions) - 1 ? 'border-b border-gray-200' : '' ?> transition-all hover:bg-primary hover:bg-opacity-5 hover:rounded-xl">
+                                            <div class="flex items-center flex-1">
+                                                <div class="text-2xl mr-4 w-10 h-10 rounded-full flex items-center justify-center bg-primary bg-opacity-10 text-primary">
+                                                    <?php 
+                                                    switch(strtolower($transaction['typetransaction'])) {
+                                                        case 'depot': echo '📥'; break;
+                                                        case 'retrait': echo '📤'; break;
+                                                        case 'paiement': echo '💳'; break;
+                                                        default: echo '💰';
+                                                    }
+                                                    ?>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <div class="font-medium text-gray-800 mb-1">
+                                                        <?php 
+                                                        switch(strtolower($transaction['typetransaction'])) {
+                                                            case 'depot': echo 'Transfert - Dépôt'; break;
+                                                            case 'retrait': echo 'Transfert - Retrait'; break;
+                                                            case 'paiement': echo 'Paiement'; break;
+                                                            default: echo ucfirst($transaction['typetransaction']);
+                                                        }
+                                                        ?>
+                                                    </div>
+                                                    <div class="text-gray-600 text-sm">
+                                                        <?php 
+                                                        $date = new DateTime($transaction['datetransaction']);
+                                                        $now = new DateTime();
+                                                        $diff = $now->diff($date);
+                                                        
+                                                        if ($diff->d == 0) {
+                                                            echo "Aujourd'hui, " . $date->format('H:i');
+                                                        } elseif ($diff->d == 1) {
+                                                            echo "Hier, " . $date->format('H:i');
+                                                        } elseif ($diff->d <= 7) {
+                                                            echo $diff->d . " jour" . ($diff->d > 1 ? 's' : '') . ", " . $date->format('H:i');
+                                                        } else {
+                                                            echo $date->format('d/m/Y à H:i');
+                                                        }
+                                                        ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="font-bold text-lg <?= strtolower($transaction['typetransaction']) === 'depot' ? 'text-success' : 'text-danger' ?>">
+                                                <?= strtolower($transaction['typetransaction']) === 'depot' ? '+' : '-' ?><?= number_format($transaction['montant'], 0, ',', ' ') ?> CFA
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="text-center py-8 text-gray-500">
+                                        <div class="text-4xl mb-4">📊</div>
+                                        <p class="text-lg">Aucune transaction récente</p>
+                                        <p class="text-sm mt-2">Vos transactions apparaîtront ici</p>
+                                    </div>
+                                <?php endif; ?>
                             </div>
-                            <div class="font-bold text-lg text-success">+50,000 CFA</div>
                         </div>
-                        
-                        <div class="flex justify-between items-center p-4 border-b border-gray-200 transition-all hover:bg-primary hover:bg-opacity-5 hover:rounded-xl">
-                            <div class="flex items-center flex-1">
-                                <div class="text-2xl mr-4 w-10 h-10 rounded-full flex items-center justify-center bg-primary bg-opacity-10 text-primary">💳</div>
-                                <div class="flex-1">
-                                    <div class="font-medium text-gray-800 mb-1">Paiement</div>
-                                    <div class="text-gray-600 text-sm">Hier, 10:15</div>
-                                </div>
-                            </div>
-                            <div class="font-bold text-lg text-danger">-25,000 CFA</div>
-                        </div>
-                        
-                        <div class="flex justify-between items-center p-4 transition-all hover:bg-primary hover:bg-opacity-5 hover:rounded-xl">
-                            <div class="flex items-center flex-1">
-                                <div class="text-2xl mr-4 w-10 h-10 rounded-full flex items-center justify-center bg-primary bg-opacity-10 text-primary">📤</div>
-                                <div class="flex-1">
-                                    <div class="font-medium text-gray-800 mb-1">Transfert - Retrait</div>
-                                    <div class="text-gray-600 text-sm">2 jours, 16:45</div>
-                                </div>
-                            </div>
-                            <div class="font-bold text-lg text-danger">-15,000 CFA</div>
-                        </div>
+
                     </div>
                 </div>
             </div>

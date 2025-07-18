@@ -1,35 +1,77 @@
 <?php
-
-namespace App\Controlleur ;
-
+namespace App\Controlleur;
+use App\Core\App;
 use App\Core\Abstract\AbstractControlleur;
+use App\Service\SecurityService;
+use App\Core\Validator;
 
-class InscriptionControlleur extends AbstractControlleur {
+class InscriptionControlleur extends AbstractControlleur 
+{
+    private SecurityService $securityService ;
+    private Validator $validator;
 
-    function create (){
-        require_once '../templates/login/inscription.php';
+    function __construct()
+    {
+            $this->layout = 'security';
+            parent::__construct();
+            $this->securityService = App::getDependencies('SecurityService');
+            $this->validator = App::getDependencies('Validator');
     }
-    function show (){
-        require_once '../templates/login/connexion.php';
+
+    public function login() 
+    {
+         $this->session->unset('erreurs');
+
+        // $data va recuperer les name dans le formulaire ayant comme methode post
+        if($_SERVER['REQUEST_METHOD']  === 'POST')
+        {
+                $data= $_POST;
+            // $login = $_POST['login'] ?? '';
+            // $password = $_POST['password'] ?? '';
+
+            // $connect = $this->securityService->getConnected($login, $password);
+
+            //on teste avant la connexion les champs
+            $rules = 
+            [
+                'login' =>  ['require', ['minLenght',3,"Le login doit contenir au minimum 3 caractères"]   ],
+                'password' =>['require', ['minLenght',5,"Le Password de passe doit contenir au moins 5 caractères"] ]
+            ];
+            if($this->validator->validate( $data,  $rules)) 
+            {
+                $connect = $this->securityService->getConnected($data['login'], $data['password']);
+                if ($connect) 
+                {
+                    $this->session->set('user',$connect->toArray());
+                    header('Location: /home' );
+                } 
+                else{
+                    $this->validator::addError('identifiants', 'Les identifiants ne correspondent pas');
+                     $this->session->set('erreurs', $this->validator::getError());
+
+                }
+            }
+            $this->session->set('erreurs', $this->validator::getError());
+        }
+        $this->renderHtml('login/connexion.php' );
     }
-    function edit () {
+    public function show(){}
+    public function edit(){}
+    public function store(){}
+    public function create(){}
+    public function index(){ require_once '../templates/compte/home.php'; }
 
-    }
-    function store (){
 
-$infos = [
-    'nom' => $_POST['nom'] ?? '',
-    'prenom' => $_POST['prenom'] ?? '',
-    'numero' =>  $_POST['numero']?? '',
-    'cni' =>  $_POST['cni']?? '',
-    'numero' =>  $_POST['numero']?? '',
-    'password' =>  $_POST['password']?? '',
-    'typeUser_id' => 1
+    public function inscrire(){
+        $this->session->unset('erreurs');
+        if($_SERVER['REQUEST_METHOD']  === 'POST')
+        {
+            
+        }
 
-] ;
-
-    }
-    function index (){
+        $inscrit= $this->securityService->inscription($user, $compte,  $tel);
 
     }
 }
+
+

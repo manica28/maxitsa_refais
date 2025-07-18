@@ -10,24 +10,24 @@ class Users /* extends AbstractEntity */ {
     private string $nom ;
     private string $prenom ;
     private string $adresse ; 
-    private string $cni ; 
-    private string $recto ; 
-    private string $verso ; 
-    private Profil $profil ;
+    private string $numerocni ; 
+    private string $photorecto ; 
+    private string $photoverso ; 
+    private Profil $profil_id ;
     private array $numeros ;
 
-  public   function __construct (int $id =1, string $login = "", string $password = "", string $nom = "" , string $prenom = "", string $adresse = "", string $cni = "", 
-    string $recto = "" ,string  $verso = ""){
+  public   function __construct (int $id =1, string $login = "", string $password = "", string $nom = "" , string $prenom = "", string $adresse = "", string $numerocni = "", 
+    string $photorecto = "" ,string  $photoverso = ""){
         $this->id = $id ; 
         $this->login = $login ;
         $this->password = $password;
         $this->nom = $nom ;
         $this->prenom =  $prenom ;  
         $this->adresse = $adresse;
-        $this->cni = $cni;
-        $this->recto = $recto;
-        $this->verso = $verso ;
-        $this->profil = new Profil();
+        $this->numerocni = $numerocni;
+        $this->photorecto = $photorecto;
+        $this->photoverso = $photoverso ;
+        $this->profil_id = new Profil();
         $this->numeros= [];
     }
 
@@ -68,33 +68,31 @@ class Users /* extends AbstractEntity */ {
     public function setAdresse(string $adresse): void {
         $this->adresse = $adresse;
     }
-    public function getCni(): string {
-        return $this->cni;
+    public function getNumerocni(): string {
+        return $this->numerocni;
     }
-    public function setCni(string $cni): void {
-        $this->cni = $cni;
+    public function setNumerocni(string $numerocni): void {
+        $this->numerocni = $numerocni;
     }
-    public function getRecto(): string {
-        return $this->recto;
+    public function getPhotorecto(): string {
+        return $this->photorecto;
     }
-    public function setRecto(string $recto): void {
-        $this->recto = $recto;
+    public function setPhotoecto(string $photorecto): void {
+        $this->photorecto = $photorecto;
     }
-    public function getVerso(): string {
-        return $this->verso;
+    public function getPhotoverso(): string {
+        return $this->photoverso;
     }
-    public function setVerso(string $verso): void {
-        $this->verso = $verso;
+    public function setPhotoverso(string $photoverso): void {
+        $this->photoverso = $photoverso;
     }
-
-
 
     /**
      * Get the value of profil
      */ 
-    public function getprofil()
+    public function getProfil()
     {
-        return $this->profil;
+        return $this->profil_id;
     }
 
     /**
@@ -102,9 +100,9 @@ class Users /* extends AbstractEntity */ {
      *
      * @return  self
      */ 
-    public function setprofil($profil)
+    public function setProfil($profil)
     {
-        $this->profil = $profil;
+        $this->profil_id = $profil;
 
         return $this;
     }
@@ -137,11 +135,11 @@ class Users /* extends AbstractEntity */ {
             'nom'      => $this->nom,
             'prenom'   => $this->prenom,
             'adresse'  => $this->adresse ,
-            'cni'      => $this->cni ,
-            'recto'    => $this->recto , 
-            'verso'    => $this->verso ,
-/*             'profil'   => $this->profil->toArray() ,
- */            'numeros'  => array_map(fn ($num) => $num->toArray() , $this->numeros)
+            'cni'      => $this->numerocni ,
+            'recto'    => $this->photorecto , 
+            'verso'    => $this->photoverso ,
+            // 'profil'   => $this->profil_id->toArray() ,
+             'numeros'  => array_map(fn ($num) => $num->toArray() , $this->numeros)
 
         ];
     }
@@ -153,9 +151,9 @@ class Users /* extends AbstractEntity */ {
             $array['nom' ] ?? "",
             $array['prenom'] ?? "",
             $array['adresse'] ?? "",
-            $array['cni'] ?? "",
-            $array['recto'] ?? "",
-            $array['verso'] ?? ""
+            $array['numerocni'] ?? "",
+            $array['photorecto'] ?? "",
+            $array['photoverso'] ?? ""
             // Les champs 'profil' et 'numeros' sont gérés par le constructeur
          ) ;
 

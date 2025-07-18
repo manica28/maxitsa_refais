@@ -8,18 +8,18 @@ class Compte {
     private int $id ; 
     private int $solde ; 
     private string $numero  ; 
-    private string $date ; 
-    private int $type ; 
+    private string $datecreation ; 
+    private int $typecompte ; 
     private array $transactions ;
     private NumeroTelephone $num ; 
 
-    function __construct (int $id =0 , int $solde = 0, $numero = "",string $date = '', $type = 1){
+    function __construct (int $id =0 , int $solde = 0, $numero = "",string $datecreation = '', $typecompte = 1){
 
         $this->id = $id ;
         $this->solde = $solde ;
         $this->numero = $numero ; 
-        $this->date = $date ;
-        $this->type = $type ; 
+        $this->datecreation = $datecreation;
+        $this->typecompte = $typecompte ; 
         $this->transactions = [];
         $this->num = new NumeroTelephone();
     }
@@ -32,8 +32,8 @@ class Compte {
             'id'       => $this->id,
             'solde'      => $this->solde,
             'numero'   => $this->numero,
-            'date'  => $this->date ,
-            'type_id'      => $this->type,
+            'date'  => $this->datecreation ,
+            'type_id'      => $this->typecompte,
             'num_id'    => $this->num 
 /*             'profil'   => $this->profil->toArray() ,
           'transactions'  => array_map(fn ($num) => $num->toArray() , $this->transactions)*/
@@ -45,8 +45,8 @@ class Compte {
         isset($array['id']) ? (int)$array['id'] : 1,
         isset($array['solde']) ? (int)$array['solde'] : 0,
         $array['numero'] ?? "",
-            $array['date' ] ?? "",
-        isset($array['type_id']) ? (int)$array['type'] : 1,
+        $array['datecreation' ] ?? "",
+        isset($array['type_id']) ? (int)$array['typetypecompte'] : 1,
            /*  $array['adresse'] ?? "",
             $array['cni'] ?? "",
             $array['recto'] ?? "",
@@ -119,9 +119,9 @@ class Compte {
     /**
      * Get the value of date
      */ 
-    public function getDate()
+    public function getDatecreation()
     {
-        return $this->date;
+        return $this->datecreation;
     }
 
     /**
@@ -129,9 +129,9 @@ class Compte {
      *
      * @return  self
      */ 
-    public function setDate($date)
+    public function setDatecreation($datecreation)
     {
-        $this->date = $date;
+        $this->datecreation = $datecreation;
 
         return $this;
     }
@@ -139,9 +139,9 @@ class Compte {
     /**
      * Get the value of type
      */ 
-    public function getType()
+    public function getTypecompte()
     {
-        return $this->type;
+        return $this->typecompte;
     }
 
     /**
@@ -149,9 +149,9 @@ class Compte {
      *
      * @return  self
      */ 
-    public function setType($type)
+    public function setTypecompte($typecompte)
     {
-        $this->type = $type;
+        $this->typecompte = $typecompte;
 
         return $this;
     }

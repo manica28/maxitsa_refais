@@ -5,6 +5,7 @@ class Validator extends Singleton
 {
     private static array $errors= [];
     private static array $rules= [];
+    private static array $ruleInscription= [];
 
     public function __construct()
     {

@@ -67,6 +67,8 @@ class SecurityControlleur extends AbstractControlleur
         session_destroy();
         header('Location: /');
     }
+
+    
 }
 
 

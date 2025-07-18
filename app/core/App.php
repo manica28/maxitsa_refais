@@ -8,7 +8,9 @@ use App\Service\SecurityService;
 use App\Core\Abstract\AbstractControlleur;
 use App\Core\Abstract\AbstractEntity;
 use App\Core\Abstract\AbstractRepository;
+use App\Repository\TransactionRepository;
 use App\Repository\UserRepository;
+use App\Service\TransactionService;
 
 class App
 {
@@ -39,13 +41,17 @@ class App
             'repository' => 
             [
                 'CompteRepository' => CompteRepository::class,
-                'UserRepository' => UserRepository::class
+                'UserRepository' => UserRepository::class,
+                'TransactionRepository' => TransactionRepository::class
+
             ],
 
             'services'  => 
             [
                 'CompteService' => CompteService::class,
-                'SecurityService' => SecurityService::class
+                'SecurityService' => SecurityService::class,
+                'TransactionService' => TransactionService::class
+
             ]
 
         ];

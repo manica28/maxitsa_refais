@@ -9,5 +9,8 @@ $routes = [
     '/inscription' => ['controller'=> InscriptionControlleur::class, 'method'=>'create'],
     '/home' => ['controller'=> CompteControlleur::class, 'method'=>'index'],
     '/connexion' => ['controller'=> SecurityControlleur::class, 'method'=>'login'],
-     '/deconnexion' => ['controller'=> SecurityControlleur::class, 'method'=>'logout']
+     '/deconnexion' => ['controller'=> SecurityControlleur::class, 'method'=>'logout'],
+     '/newsecondaire' => ['controller'=> CompteControlleur::class, 'method'=>'create'],
+      '/transactions' => ['controller' => CompteControlleur::class,'method' => 'show'
+    ],
 ];

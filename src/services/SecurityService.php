@@ -35,4 +35,9 @@ class SecurityService
         return null ;
     }
 
+public function inscription($user, $compte, $tel)
+{
+    $inscription= $this->userRepository->inscription( $user, $compte,  $tel);
+}
+
 }

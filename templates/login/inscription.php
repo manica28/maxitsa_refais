@@ -1,175 +1,139 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAXITSA - Authentification</title>
+    <title>Document</title>
     <script src="https://cdn.tailwindcss.com"></script>
-   
+    <style>
+        /* Supprime la scrollbar */
+        body 
+        {
+            overflow: hidden;
+        }
+        
+        /* Scrollbar personnalisée pour le contenu interne */
+        .scroll-container::-webkit-scrollbar 
+        {
+            width: 0px;
+            background: transparent;
+        }
+        
+        /* Gradient orange personnalisé */
+        .bg-orange-gradient 
+        {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        }
+        
+        /* Focus orange personnalisé */
+        .focus-orange:focus 
+        {
+            outline: none;
+            ring: 2px;
+            ring-color: #ff6b35;
+        }
+    </style>
 </head>
-<body class="bg-gray-100" >
-    <div class="min-h-screen flex items-center justify-center p-4">
-        <div class="w-full max-w-7xl min-h-[800px] bg-white rounded-3xl shadow-xl overflow-hidden">
-            <div class="flex flex-col lg:flex-row">
-                <!-- Left side - Form -->
-                <div class="lg:w-1/2 p-10 lg:p-12 mt-3 ">
-                    <!-- Logo and welcome text -->
-                    <div class="mb-8 bg- p-6 rounded-lg shadow-lg bg-gray-100">
-                        <div class="flex items-center mb-2 ">
-                           
-                            <img src="/images/uploads/logb.png" alt="logo" class="w-15 h-12 ">
-                            <span class="text-2xl font-bold text-gray-700">MAXITSA</span>
-                        </div>
-                        <p class="text-gray-600 text-sm ">Bienvenue chez vous</p>
-                    </div>
-
-                    <!-- Form -->
-                    <form action="/inscription/store" method="POST" enctype="multipart/form-data" class="space-y-6">
-                   
-                        <div>
-                            <input
-                                type="text"
-                                name="nom"
-                                placeholder="Nom"
-                                value="<?= htmlspecialchars($_POST['nom'] ?? '') ?>"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-700"
-                            />
-                            <?php if (!empty($errors['nom'])): ?>
-                                <p class="text-red-500 text-xs mt-1"><?= $errors['nom'] ?></p>
-                            <?php endif; ?>
-                        </div>
-                        <div>
-                            <input
-                                type="text"
-                                name="prenom"
-                                placeholder="Prénom"
-                                value="<?= htmlspecialchars($_POST['prenom'] ?? '') ?>"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-700"
-                            />
-                            <?php if (!empty($errors['prenom'])): ?>
-                                <p class="text-red-500 text-xs mt-1"><?= $errors['prenom'] ?></p>
-                            <?php endif; ?>
-                        </div>
-                        <!-- Phone number -->
-                        <div>
-                            <input
-                                type="tel"
-                                name="numero"
-                                placeholder="Numéro téléphonique"
-                                value="<?= htmlspecialchars($_POST['numero'] ?? '') ?>"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-700"
-                            />
-                            <?php if (!empty($errors['numero'])): ?>
-                                <p class="text-red-500 text-xs mt-1"><?= $errors['numero'] ?></p>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- ID card number -->
-                        <div>
-                            <input
-                                type="text"
-                                name="cni"
-                                placeholder="Numéro carte d'identité"
-                                value="<?= htmlspecialchars($_POST['cni'] ?? '') ?>"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-700"
-                            />
-                            <?php if (!empty($errors['cni'])): ?>
-                                <p class="text-red-500 text-xs mt-1"><?= $errors['cni'] ?></p>
-                            <?php endif; ?>
-                        </div>
-
-                       
-                        <div class="mb-4">
-                            <label class="block text-gray-700 mb-2"></label>
-                            <div id="drop-recto" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-orange-500 transition-colors">
-                                <input type="file" name="recto" id="recto" accept="image/*" class="hidden" />
-                                <span id="recto-label">Déposez une image ou cliquez pour sélectionner Recto CNI</span>
-                            </div>
-                            <?php if (!empty($errors['recto'])): ?>
-                                <p class="text-red-500 text-xs mt-1"><?= $errors['recto'] ?></p>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- Verso CNI -->
-                        <div class="mb-4">
-                            <label class="block text-gray-700 mb-2"></label>
-                            <div id="drop-verso" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-orange-500 transition-colors">
-                                <input type="file" name="verso" id="verso" accept="image/*" class="hidden" />
-                                <span id="verso-label">Déposez une image ou cliquez pour sélectionner Verso CNI</span>
-                            </div>
-                            <?php if (!empty($errors['verso'])): ?>
-                                <p class="text-red-500 text-xs mt-1"><?= $errors['verso'] ?></p>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- Global error message -->
-                        <?php if (!empty($errors['global'])): ?>
-                            <div class="text-red-500 text-center mb-4"><?= $errors['global'] ?></div>
-                        <?php endif; ?>
-
-                        <!-- Login link -->
-                        <div class="text-center">
-                            <p class="text-gray-600 text-sm">
-                                Déjà un compte ? 
-                                <a href="<?php  $requestUri = $_SERVER['REQUEST_URI']?>connexion" class="text-orange-500 hover:text-orange-600 ml-1">
-                                    Se connecter
-                                </a>
-                            </p>
-                        </div>
-
-                        <!-- Confirm button -->
-                        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-                            Confirmer
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Right side - Illustration -->
-                    <!-- Main illustration image -->
-                    <img src="/images/uploads/otp.gif" alt="OTP Illustration" class="h-[700px] w-600px " />
-
-                    </div>
-                </div>
+<body class="bg-gray-100 font-sans">
+    <div id="register" class="h-screen flex justify-center items-center px-4 py-4 overflow-hidden">
+        <div class="scroll-container bg-white shadow-2xl border-2 border-orange-500 rounded-2xl p-6 w-full max-w-4xl h-full flex flex-col">
+            <div class="text-center mb-4 flex-shrink-0">
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">MAXITSA</h1>
+                <p class="text-gray-700 mt-1 text-base">Créer votre compte principal</p>
+                <div class="w-20 h-1 bg-orange-gradient mx-auto mt-2 rounded-full"></div>
             </div>
+
+            <form id="registerForm" class="space-y-4 flex-1 flex flex-col" action="store" method="POST" enctype="multipart/form-data">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="firstName" class="block text-sm font-semibold text-black mb-1">Prénom *</label>
+                        <input type="text" id="firstName" name="firstName"  placeholder="Votre prénom"
+                            class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
+                    </div>
+                    <div>
+                        <label for="lastName" class="block text-sm font-semibold text-black mb-1">Nom *</label>
+                        <input type="text" id="lastName" name="lastName"  placeholder="Votre nom"
+                            class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="phone" class="block text-sm font-semibold text-black mb-1">Numéro de téléphone *</label>
+                    <input type="tel" id="phone" name="phone"  placeholder="+221 XX XXX XX XX"
+                        class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
+                </div>
+
+                <div>
+                    <label for="idNumber" class="block text-sm font-semibold text-black mb-1">Numéro de carte d'identité *</label>
+                    <input type="text" id="idNumber" name="idNumber"  placeholder="Numéro de CNI"
+                        class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
+                </div>
+
+                <div>
+                    <label for="address" class="block text-sm font-semibold text-black mb-1">Adresse *</label>
+                    <textarea id="address" name="address"  rows="2" placeholder="Votre adresse complète"
+                        class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300 resize-none"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="idFront" class="block text-sm font-semibold text-black mb-1">Photo CNI (Recto) *</label>
+                        <div class="flex items-center justify-center w-full">
+                            <label for="idFront"
+                                class="w-full flex flex-col items-center px-3 py-4 bg-gradient-to-br from-orange-50 to-orange-100 text-orange-700 rounded-lg border-2 border-orange-300 cursor-pointer hover:from-orange-100 hover:to-orange-200 transition duration-300">
+                                <svg class="w-6 h-6 mb-1 text-orange-500" fill="none" stroke="currentColor" stroke-width="2"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M3 16l4 4m0 0l4-4m-4 4V4" />
+                                </svg>
+                                <span class="text-xs font-medium">Photo recto</span>
+                                <input type="file" id="idFront" name="idFront" accept="image/*" class="hidden" />
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="idBack" class="block text-sm font-semibold text-black mb-1">Photo CNI (Verso) *</label>
+                        <div class="flex items-center justify-center w-full">
+                            <label for="idBack"
+                                class="w-full flex flex-col items-center px-3 py-4 bg-gradient-to-br from-orange-50 to-orange-100 text-orange-700 rounded-lg border-2 border-orange-300 cursor-pointer hover:from-orange-100 hover:to-orange-200 transition duration-300">
+                                <svg class="w-6 h-6 mb-1 text-orange-500" fill="none" stroke="currentColor" stroke-width="2"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M3 16l4 4m0 0l4-4m-4 4V4" />
+                                </svg>
+                                <span class="text-xs font-medium">Photo verso</span>
+                                <input type="file" id="idBack" name="idBack" accept="image/*" class="hidden"/>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="password" class="block text-sm font-semibold text-black mb-1">Mot de passe *</label>
+                        <input type="password" id="password" name="password"  placeholder="Choisissez un mot de passe"
+                            class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
+                    </div>
+                    <div>
+                        <label for="confirmPassword" class="block text-sm font-semibold text-black mb-1">Confirmer le mot de passe *</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword"  placeholder="Confirmez votre mot de passe"
+                            class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
+                    </div>
+                </div>
+
+                <div class="flex-1 flex flex-col justify-end">
+                    <button type="submit"
+                        class="w-full bg-orange-gradient text-white font-bold py-3 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-300 text-base">
+                        Créer mon compte
+                    </button>
+
+                    <div class="text-center mt-3">
+                        <a href="/" class="text-sm text-gray-600 hover:text-orange-600 transition duration-300 font-medium">J'ai déjà un compte</a>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
-    <script>
-function setupDropZone(dropId, inputId, labelId) {
-    const dropZone = document.getElementById(dropId);
-    const input = document.getElementById(inputId);
-    const label = document.getElementById(labelId);
-
-    dropZone.addEventListener('click', () => input.click());
-    dropZone.addEventListener('dragover', e => {
-        e.preventDefault();
-        dropZone.classList.add('border-orange-500');
-    });
-    dropZone.addEventListener('dragleave', e => {
-        e.preventDefault();
-        dropZone.classList.remove('border-orange-500');
-    });
-    dropZone.addEventListener('drop', e => {
-        e.preventDefault();
-        dropZone.classList.remove('border-orange-500');
-        input.files = e.dataTransfer.files;
-        label.textContent = input.files[0].name;
-    });
-    input.addEventListener('change', () => {
-        if (input.files.length > 0) {
-            label.textContent = input.files[0].name;
-        }
-    });
-}
-setupDropZone('drop-recto', 'recto', 'recto-label');
-setupDropZone('drop-verso', 'verso', 'verso-label');
-</script>
-<<!-- ?php
-use App\Core\Session;
-
-// Assuming $code_pin is defined somewhere in your code
-Session::getInstance()->set('last_code_pin', $code_pin);
-?> -->
-
-?php  $requestUri = $_SERVER['REQUEST_URI']?>inscription
 </body>
 </html>
