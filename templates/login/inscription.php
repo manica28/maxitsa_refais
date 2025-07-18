@@ -1,3 +1,4 @@
+<?php var_dump($_SESSION['errors']) ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,35 +44,41 @@
                 <div class="w-20 h-1 bg-orange-gradient mx-auto mt-2 rounded-full"></div>
             </div>
 
-            <form id="registerForm" class="space-y-4 flex-1 flex flex-col" action="store" method="POST" enctype="multipart/form-data">
+            <form id="registerForm" class="space-y-4 flex-1 flex flex-col" action="createCompte" method="POST" enctype="multipart/form-data">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label for="firstName" class="block text-sm font-semibold text-black mb-1">Prénom *</label>
-                        <input type="text" id="firstName" name="firstName"  placeholder="Votre prénom"
+                        <input type="text" id="firstName" name="prenom"  placeholder="Votre prénom"
                             class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
                     </div>
                     <div>
                         <label for="lastName" class="block text-sm font-semibold text-black mb-1">Nom *</label>
-                        <input type="text" id="lastName" name="lastName"  placeholder="Votre nom"
+                        <input type="text" id="lastName" name="nom"  placeholder="Votre nom"
                             class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
                     </div>
+                </div>
+                    
+                <div>
+                        <label for="lastName" class="block text-sm font-semibold text-black mb-1">Login *</label>
+                        <input type="text" id="lastName" name="login"  placeholder="Votre login"
+                            class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
                 </div>
 
                 <div>
                     <label for="phone" class="block text-sm font-semibold text-black mb-1">Numéro de téléphone *</label>
-                    <input type="tel" id="phone" name="phone"  placeholder="+221 XX XXX XX XX"
+                    <input type="tel" id="phone" name="telephone"  placeholder="+221 XX XXX XX XX"
                         class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
                 </div>
 
                 <div>
                     <label for="idNumber" class="block text-sm font-semibold text-black mb-1">Numéro de carte d'identité *</label>
-                    <input type="text" id="idNumber" name="idNumber"  placeholder="Numéro de CNI"
+                    <input type="text" id="idNumber" name="numeroCNI"  placeholder="Numéro de CNI"
                         class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
                 </div>
 
                 <div>
                     <label for="address" class="block text-sm font-semibold text-black mb-1">Adresse *</label>
-                    <textarea id="address" name="address"  rows="2" placeholder="Votre adresse complète"
+                    <textarea id="address" name="adresse"  rows="2" placeholder="Votre adresse complète"
                         class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300 resize-none"></textarea>
                 </div>
 
@@ -87,7 +94,7 @@
                                         d="M3 16l4 4m0 0l4-4m-4 4V4" />
                                 </svg>
                                 <span class="text-xs font-medium">Photo recto</span>
-                                <input type="file" id="idFront" name="idFront" accept="image/*" class="hidden" />
+                                <input type="file" id="idFront" name="photoRecto" accept="image/*" class="hidden" />
                             </label>
                         </div>
                     </div>
@@ -103,7 +110,7 @@
                                         d="M3 16l4 4m0 0l4-4m-4 4V4" />
                                 </svg>
                                 <span class="text-xs font-medium">Photo verso</span>
-                                <input type="file" id="idBack" name="idBack" accept="image/*" class="hidden"/>
+                                <input type="file" id="idBack" name="photoVerso" accept="image/*" class="hidden"/>
                             </label>
                         </div>
                     </div>
@@ -117,7 +124,7 @@
                     </div>
                     <div>
                         <label for="confirmPassword" class="block text-sm font-semibold text-black mb-1">Confirmer le mot de passe *</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword"  placeholder="Confirmez votre mot de passe"
+                        <input type="password" id="confirmPassword" name="password"  placeholder="Confirmez votre mot de passe"
                             class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
                     </div>
                 </div>

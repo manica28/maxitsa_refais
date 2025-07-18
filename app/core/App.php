@@ -2,15 +2,16 @@
 
 namespace App\Core;
 
-use App\Repository\CompteRepository ;
 use App\Service\CompteService;
 use App\Service\SecurityService;
-use App\Core\Abstract\AbstractControlleur;
-use App\Core\Abstract\AbstractEntity;
-use App\Core\Abstract\AbstractRepository;
-use App\Repository\TransactionRepository;
 use App\Repository\UserRepository;
 use App\Service\TransactionService;
+use App\Core\Abstract\AbstractEntity;
+use App\Repository\CompteRepository ;
+use App\Core\Abstract\AbstractRepository;
+use App\Repository\TransactionRepository;
+use App\Core\Abstract\AbstractControlleur;
+use App\Repository\NumeroTelephoneRepository;
 
 class App
 {
@@ -28,7 +29,8 @@ class App
                     'Router'  => Router::class,
                     'Session'  => Session::class,
                     'Validator'  => Validator::class,
-                    'singleton'  => Singleton::class
+                    'singleton'  => Singleton::class,
+                    'ImageService'  => ImageService::class
             ],
 
             'abstract' => 
@@ -42,7 +44,9 @@ class App
             [
                 'CompteRepository' => CompteRepository::class,
                 'UserRepository' => UserRepository::class,
-                'TransactionRepository' => TransactionRepository::class
+                'TransactionRepository' => TransactionRepository::class,
+                'NumeroTelephoneRepository' => NumeroTelephoneRepository::class,
+                
 
             ],
 

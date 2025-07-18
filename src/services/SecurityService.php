@@ -1,11 +1,14 @@
 <?php
 namespace App\Service;
 use App\Core\App;
+use App\Entity\NumeroTelephone;
 use App\Repository\UserRepository;
+use App\Repository\NumeroTelephoneRepository;
 
 class SecurityService 
 {
     private  UserRepository $userRepository;
+    private  NumeroTelephoneRepository $NumeroTelephoneRepository;
 
     private static SecurityService|null $instance = null ;
 
@@ -21,6 +24,7 @@ class SecurityService
     function __construct ()
     {
         $this->userRepository = App::getDependencies('UserRepository');
+        $this->NumeroTelephoneRepository = App::getDependencies('NumeroTelephoneRepository');
     }
 
 
@@ -35,9 +39,9 @@ class SecurityService
         return null ;
     }
 
-public function inscription($user, $compte, $tel)
+public function inscription($user, $telephone)
 {
-    $inscription= $this->userRepository->inscription( $user, $compte,  $tel);
+    return $this->NumeroTelephoneRepository->insertTransaction($user, $telephone);
 }
 
 }

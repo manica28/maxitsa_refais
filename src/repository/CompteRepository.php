@@ -2,7 +2,7 @@
 namespace App\Repository ;
 
 use App\Entity\Compte;
-use App\Enums \TypeCompte;
+use App\Enums\TypeCompte;
 use App\Core\Abstract\AbstractRepository;
 
 class CompteRepository extends AbstractRepository 
@@ -23,25 +23,30 @@ class CompteRepository extends AbstractRepository
       function update(){}
       function delete (){}
 
-      function insert(array $array)
+      function insert(array $array){}
+
+      public function inserCompte()
       {
-         //on inserer aussi dans la table compte
-         $stmt2= $this->DB->prepare("INSERT INTO compte (solde, numero, datecreation, typecompte) VALUES(:solde, :numero, :datecreation, :typecompte)");
-          $stmt2->execute(
-[
-          'solde' =>0,
-          'numero' => 'rtfyuh', //fonction qui genere les matricules
-          'datecreation' =>new \DateTime(),
-          'typecompte' =>TypeCompte::PRINCIPAL->value,
-        ]);
-        return (int) $this->DB->lastInsertId();
+        //on inserer aussi dans la table compte
+         $stmt2= $this->DB->prepare("INSERT INTO $this->table (solde, numero, datecreation, typecompte) 
+                                                          VALUES(:solde, :numero, :datecreation, :typecompte)");
+        $genernum = "COM-" .time();
+         $resultat=$stmt2->execute( 
+        [  'solde' =>0,
+                    'numero' => $genernum, //fonction qui genere les matricules
+                    'datecreation' => date("Y-m-d"),
+                    'typecompte' =>TypeCompte::PRINCIPAL->value,]
+        );
+        if($resultat)
+        {
+           return (int) $this->DB->lastInsertId();
+        }
+        return false;
+
       }
-
-
 
       function selectById($id){}
       function selectBy(array $filter) {}
-
       // pour obtenir les information de l'utilisateur connecté: solde , tel, etc...
       public function  getCompteClient ($user_id):array|null
       {

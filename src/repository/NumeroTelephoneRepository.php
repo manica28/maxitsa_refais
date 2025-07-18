@@ -1,16 +1,18 @@
 <?php
 namespace App\Repository;
 
+use App\Core\App;
 use App\Entity\Users;
 use App\Entity\NumeroTelephone;
 use App\Core\Abstract\AbstractRepository;
 
 class NumeroTelephoneRepository extends AbstractRepository 
 {
+      private string $table = 'numerotelephone';
+      private CompteRepository $compteRepository;
+      private UserRepository $userRepository;
 
- private string $table = 'numerotelephone';
-
-  private static NumeroTelephoneRepository|null $instance = null ;
+      private static NumeroTelephoneRepository|null $instance = null ;
 
  public static function getInstance() 
  {
@@ -24,13 +26,29 @@ class NumeroTelephoneRepository extends AbstractRepository
   public function __construct ()
   {
     parent::__construct ();
+        $this->compteRepository = App::getDependencies('CompteRepository');
+        $this->userRepository = App::getDependencies('UserRepository');     
   }
 
- public function insertTransaction(Users $user, string $telephone)
+ public function insertTransaction( $user, string $telephone)
  {
+    $this->DB->beginTransaction();
     try 
     {
-        
+        //recuperation des id de user et compte
+        $user_id= $this->userRepository->insert($user);
+        $compte_id=  $this->compteRepository->inserCompte();
+
+        $stmt=$this->DB->prepare("INSERT INTO $this->table (telephone, user_id, compte_id) 
+                                                          VALUES(:telephone, :user_id , :compte_id)");
+        $stmt->execute(
+          [
+          'telephone' => $telephone,
+          'user_id' => $user_id,
+          'compte_id' => $compte_id
+        ]);
+        $this->DB->commit();
+        return true;
     } 
     catch (\PDOException $e) 
     {

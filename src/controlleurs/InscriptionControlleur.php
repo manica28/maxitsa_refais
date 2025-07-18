@@ -1,9 +1,10 @@
 <?php
 namespace App\Controlleur;
 use App\Core\App;
-use App\Core\Abstract\AbstractControlleur;
-use App\Service\SecurityService;
 use App\Core\Validator;
+use App\Core\ImageService;
+use App\Service\SecurityService;
+use App\Core\Abstract\AbstractControlleur;
 
 class InscriptionControlleur extends AbstractControlleur 
 {
@@ -18,60 +19,105 @@ class InscriptionControlleur extends AbstractControlleur
             $this->validator = App::getDependencies('Validator');
     }
 
-    public function login() 
-    {
-         $this->session->unset('erreurs');
+    
 
-        // $data va recuperer les name dans le formulaire ayant comme methode post
-        if($_SERVER['REQUEST_METHOD']  === 'POST')
-        {
-                $data= $_POST;
-            // $login = $_POST['login'] ?? '';
-            // $password = $_POST['password'] ?? '';
-
-            // $connect = $this->securityService->getConnected($login, $password);
-
-            //on teste avant la connexion les champs
-            $rules = 
-            [
-                'login' =>  ['require', ['minLenght',3,"Le login doit contenir au minimum 3 caractères"]   ],
-                'password' =>['require', ['minLenght',5,"Le Password de passe doit contenir au moins 5 caractères"] ]
-            ];
-            if($this->validator->validate( $data,  $rules)) 
-            {
-                $connect = $this->securityService->getConnected($data['login'], $data['password']);
-                if ($connect) 
-                {
-                    $this->session->set('user',$connect->toArray());
-                    header('Location: /home' );
-                } 
-                else{
-                    $this->validator::addError('identifiants', 'Les identifiants ne correspondent pas');
-                     $this->session->set('erreurs', $this->validator::getError());
-
-                }
-            }
-            $this->session->set('erreurs', $this->validator::getError());
-        }
-        $this->renderHtml('login/connexion.php' );
-    }
     public function show(){}
     public function edit(){}
     public function store(){}
-    public function create(){}
+    public function create(){
+         $this->renderHtml('login/inscription.php');
+        }
     public function index(){ require_once '../templates/compte/home.php'; }
 
-
-    public function inscrire(){
-        $this->session->unset('erreurs');
-        if($_SERVER['REQUEST_METHOD']  === 'POST')
-        {
-            
-        }
-
-        $inscrit= $this->securityService->inscription($user, $compte,  $tel);
-
+    private function validateForm(array &$data): array 
+    {
+        $this->validator->validate($data, 
+        [
+            'nom' => ['require', ['minLenght',3,"Le login doit contenir au minimum 3 caractères"]],
+            'prenom' => ['require', ['minLenght',3,"Le login doit contenir au minimum 3 caractères"]] ,
+            'login' => ['require', ['minLenght',3,"Le login doit contenir au minimum 3 caractères"]],
+            'password' => ['require', ['minLenght',3,"Le login doit contenir au minimum 3 caractères"], 'isPassword'],
+            'adresse' => ['require'],
+            'telephone' => ['require', 'isPhone'],
+            'numeroCNI' => ['require', 'isCNI']
+        ]);
+        return $this->validator->getError();
     }
+
+    private function buildUserData(array $data, string $photoPath): array {
+    return [
+        'nom' => $data['nom'],
+        'prenom' => $data['prenom'],
+        'login' => $data['login'],
+        'password' => $data['password'],
+        'adresse' => $data['adresse'],
+        'numerocni' => $data['numeroCNI'],
+        'photorecto' => $photoPath,
+        'photoverso' => $photoPath,
+        'profil_id' => 1
+    ];
+}
+    private function uploadPhotos(array $files): string|false 
+    {
+        try 
+        {
+            $uploads = ImageService::uploadMultipleImages([
+                'photoRecto' => $files['photoRecto'] ?? null,
+                'photoVerso' => $files['photoVerso'] ?? null
+            ], __DIR__ . '/../../public/images/uploads/');
+
+            return json_encode([
+                'recto' => $uploads['photoRecto']['url'],
+                'verso' => $uploads['photoVerso']['url']
+            ]);
+        } 
+        catch (\Exception $e) 
+        {
+            return false;
+        }
+    }
+
+    public function createComptePrincipal() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $data = $_POST;
+        $numeroTelephone = $data['telephone'];    
+        $errors = $this->validateForm($data);
+    $this->session->set('errors', []);
+
+
+        if (empty($errors)) {
+            $photoPath = $this->uploadPhotos($_FILES);
+            if (!$photoPath) {
+                $this->session->set('errors', ['photoIdentite' => "Erreur lors de l'envoi des photos."]);
+            } else {
+                $userData = $this->buildUserData($data, $photoPath);
+
+                $result = $this->securityService->inscription($userData, $numeroTelephone);
+                if ($result === true) {
+                    header("Location: ".APP_URL."/");
+
+                    // $twilioService = new TwilioService();
+                    // $message = "Bonjour {$userData['prenom']} {$userData['nom']}, votre compte principal a été  créé avec succès sur Maxit SA}.";
+                    // $smsResult = $twilioService->sendSMS($numeroTelephone, $message);
+
+                    // if ($smsResult !== true) {
+                    //     error_log("Erreur SMS Twilio : " . $smsResult);
+                    // }
+                    // exit;
+                }
+                 else {
+                    $this->session->set('errors', ['compte' => $result]);
+                }
+
+            }
+        } else {
+            $this->session->set('errors', $errors);
+        }
+    }
+
+    $this->layout = 'security';
+    $this->renderHtml("login/inscription.php");
+}
 }
 
 

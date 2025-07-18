@@ -11,6 +11,7 @@ $routes = [
     '/connexion' => ['controller'=> SecurityControlleur::class, 'method'=>'login'],
      '/deconnexion' => ['controller'=> SecurityControlleur::class, 'method'=>'logout'],
      '/newsecondaire' => ['controller'=> CompteControlleur::class, 'method'=>'create'],
-      '/transactions' => ['controller' => CompteControlleur::class,'method' => 'show'
-    ],
+      '/transactions' => ['controller' => CompteControlleur::class,'method' => 'show'],
+      '/createCompte' => ['controller' => InscriptionControlleur::class, 'method' => 'createComptePrincipal']
+    
 ];
