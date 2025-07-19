@@ -145,7 +145,7 @@
                             <h3 class="mb-4 text-gray-800 text-xl font-semibold">📊 Statistiques</h3>
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="text-center p-4 bg-primary bg-opacity-10 rounded-xl">
-                                    <div class="text-3xl font-bold text-primary"><?php echo count($comptes); ?></div>
+                                    <div class="text-3xl font-bold text-primary"></div>
                                     <div class="text-gray-600">Comptes</div>
                                 </div>
                                 <div class="text-center p-4 bg-success bg-opacity-10 rounded-xl">

@@ -3,12 +3,14 @@ namespace App\Service;
 use App\Core\App;
 use App\Entity\NumeroTelephone;
 use App\Repository\UserRepository;
+use App\Repository\CompteRepository;
 use App\Repository\NumeroTelephoneRepository;
 
 class SecurityService 
 {
     private  UserRepository $userRepository;
     private  NumeroTelephoneRepository $NumeroTelephoneRepository;
+    private  CompteRepository $compteRepository;
 
     private static SecurityService|null $instance = null ;
 
@@ -24,6 +26,7 @@ class SecurityService
     function __construct ()
     {
         $this->userRepository = App::getDependencies('UserRepository');
+        $this->compteRepository = App::getDependencies('CompteRepository');
         $this->NumeroTelephoneRepository = App::getDependencies('NumeroTelephoneRepository');
     }
 
@@ -47,10 +50,29 @@ public function inscription($user, $telephone)
 //     return $this->NumeroTelephoneRepository->insertSecondaire($user_id, $solde ,$telephone);
 // }
 public function createCompteSecondaire($user_id, $solde, $telephone){
-    error_log("SecurityService::createCompteSecondaire appelé avec: user_id=$user_id, solde=$solde, telephone=$telephone");
-    $result = $this->NumeroTelephoneRepository->insertSecondaire($user_id, $solde ,$telephone);
-    error_log("Résultat insertSecondaire: " . print_r($result, true));
-    return $result;
+    // error_log("SecurityService::createCompteSecondaire appelé avec: user_id=$user_id, solde=$solde, telephone=$telephone");
+    // $result = $this->NumeroTelephoneRepository->insertSecondaire($user_id, $solde ,$telephone);
+    // error_log("Résultat insertSecondaire: " . print_r($result, true));
+    // return $result;
+
+    $user = $this->userRepository->selectById($user_id);
+        if (!$user) 
+        {
+            return "Utilisateur non trouvé.";
+        }
+        $existingNumero = $this->NumeroTelephoneRepository->findByNumero($telephone);
+        if ($existingNumero) 
+        {
+            return "Ce numéro de téléphone est déjà associé à un compte.";
+        }
+        $comptePrincipal = $this->compteRepository->findPrincipalByUserId($user_id);
+        if (!$comptePrincipal) 
+        {
+            return "Vous devez d'abord créer un compte principal.";
+        }
+        return $this->NumeroTelephoneRepository->insertSecondaire($user_id, $solde,$telephone);
+        
+    }
 }
 
-}
+

@@ -83,7 +83,41 @@ class NumeroTelephoneRepository extends AbstractRepository
     } 
  }
 
+      public function findByNumero($telephone): ?array {
+        $query = "SELECT nt.*, c.*, u.nom, u.prenom FROM {$this->table} nt
+                  JOIN compte c ON nt.compte_id = c.id
+                  JOIN users u ON nt.user_id = u.id
+                  WHERE nt.telephone = :telephone";
+        $stmt = $this->DB->prepare($query);
+        $stmt->execute(['telephone' => $telephone]);
+        return $stmt->fetch() ?: null;
+    }
 
+    // public function findByUserId($userId): array {
+    //     $query = "SELECT nt.*, c.numero as numero_compte, c.typecompte, c.solde, c.date
+    //               FROM {$this->table} nt
+    //               JOIN comptes c ON nt.compte_id = c.id
+    //               WHERE nt.user_id = :id_user
+    //               ORDER BY c.typecompte DESC, c.date ASC";
+    //     $stmt = $this->DB>prepare($query);
+    //     $stmt->execute(['id_user' => $userId]);
+    //     return $stmt->fetchAll();
+    // }
+
+//     public function findUserIdByCompteId($compteId): int {
+//     $query = "SELECT user_id FROM numeroTelephone WHERE compte_id = :compte_id";
+//     $stmt = $this->DB->prepare($query);
+//     $stmt->execute(['compte_id' => $compteId]);
+//     $result = $stmt->fetch();
+//     return $result ? $result['user_id'] : 0;
+// }
+
+//     public function findByCompteId($compteId): ?array {
+//         $query = "SELECT * FROM {$this->table} WHERE compte_id = :id_compte";
+//         $stmt = $this->DB->prepare($query);
+//         $stmt->execute(['id_compte' => $compteId]);
+//         return $stmt->fetch() ?: null;
+//     }
  function selectAll(){}
  function update(){}
  function delete (){}

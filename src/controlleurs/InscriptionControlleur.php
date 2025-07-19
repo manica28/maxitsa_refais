@@ -13,36 +13,48 @@ class InscriptionControlleur extends AbstractControlleur
 
     function __construct()
     {
-            $this->layout = 'security';
-            parent::__construct();
-            $this->securityService = App::getDependencies('SecurityService');
-            $this->validator = App::getDependencies('Validator');
+        $this->layout = 'security';
+        parent::__construct();
+        $this->securityService = App::getDependencies('SecurityService');
+        $this->validator = App::getDependencies('Validator');
     }
-
-    
 
     public function show(){}
     public function edit(){}
     public function store(){}
     public function create(){
-         $this->renderHtml('login/inscription.php');
-        }
-    public function index(){ require_once '../templates/compte/home.php'; }
+        $this->renderHtml('login/inscription.php');
+    }
+    public function index(){ 
+        require_once '../templates/compte/home.php'; 
+    }
 
     private function validateForm(array &$data): array 
     {
         $this->validator->validate($data, 
         [
-            'nom' => ['require', ['minLenght',3,"Le login doit contenir au minimum 3 caractères"]],
-            'prenom' => ['require', ['minLenght',3,"Le login doit contenir au minimum 3 caractères"]] ,
+            'nom' => ['require', ['minLenght',3,"Le nom doit contenir au minimum 3 caractères"]],
+            'prenom' => ['require', ['minLenght',3,"Le prénom doit contenir au minimum 3 caractères"]] ,
             'login' => ['require', ['minLenght',3,"Le login doit contenir au minimum 3 caractères"]],
-            'password' => ['require', ['minLenght',3,"Le login doit contenir au minimum 3 caractères"], 'isPassword'],
+            'password' => ['require', ['minLenght',3,"Le mot de passe doit contenir au minimum 3 caractères"], 'isPassword'],
             'adresse' => ['require'],
             'telephone' => ['require', 'isPhone'],
             'numeroCNI' => ['require', 'isCNI']
         ]);
         return $this->validator->getError();
     }
+
+    // Validation spécifique pour les comptes secondaires
+    private function validateSecondaireForm(array &$data): array 
+    {
+        $this->validator->validate($data, 
+        [
+            'telephone' => ['require', 'isPhone'],
+            'solde' => ['numeric'] // optionnel mais doit être numérique si fourni
+        ]);
+        return $this->validator->getError();
+    }
+
     private function buildUserData(array $data, string $photoPath): array 
     {
         return [
@@ -56,7 +68,7 @@ class InscriptionControlleur extends AbstractControlleur
             'photoverso' => $photoPath,
             'profil_id' => 1
         ];
-}
+    }
    
     // fonction qui crée un compte principal
     public function createComptePrincipal() 
@@ -66,84 +78,109 @@ class InscriptionControlleur extends AbstractControlleur
             $data = $_POST;
             $numeroTelephone = $data['telephone'];    
             $errors = $this->validateForm($data);
-        $this->session->set('errors', []);
+            $this->session->set('errors', []);
 
-        if (empty($errors)) {
-            $photoPath = $this->uploadPhotos($_FILES);
-            if (!$photoPath) {
-                $this->session->set('errors', ['photoIdentite' => "Erreur lors de l'envoi des photos."]);
+            if (empty($errors)) {
+                $photoPath = $this->uploadPhotos($_FILES);
+                if (!$photoPath) {
+                    $this->session->set('errors', ['photoIdentite' => "Erreur lors de l'envoi des photos."]);
+                } else {
+                    $userData = $this->buildUserData($data, $photoPath);
+
+                    $result = $this->securityService->inscription($userData, $numeroTelephone);
+                    if ($result === true) {
+                        header("Location: ".APP_URL."/");
+                        exit;
+                    }
+                    else 
+                    {
+                        $this->session->set('errors', ['compte' => $result]);
+                    }
+                }
             } else {
-                $userData = $this->buildUserData($data, $photoPath);
-
-                $result = $this->securityService->inscription($userData, $numeroTelephone);
-                if ($result === true) {
-                    header("Location: ".APP_URL."/");
-
-                    // $twilioService = new TwilioService();
-                    // $message = "Bonjour {$userData['prenom']} {$userData['nom']}, votre compte principal a été  créé avec succès sur Maxit SA}.";
-                    // $smsResult = $twilioService->sendSMS($numeroTelephone, $message);
-
-                    // if ($smsResult !== true) {
-                    //     error_log("Erreur SMS Twilio : " . $smsResult);
-                    // }
-                    // exit;
-                }
-                else 
-                {
-                    $this->session->set('errors', ['compte' => $result]);
-                }
+                $this->session->set('errors', $errors);
             }
-        } else {
-            $this->session->set('errors', $errors);
         }
+        $this->layout = 'security';
+        $this->renderHtml("login/inscription.php");
     }
-    $this->layout = 'security';
-    $this->renderHtml("login/inscription.php");
-}
 
-public function createCompteSecondaire() 
+    public function createCompteSecondaire() 
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') 
         {
-            $data = $_POST;
-            $numeroTelephone = $data['telephone']; 
-            
+            try 
+            {
+                // Nettoyer les erreurs précédentes
+                $this->session->set('errors', []);
+                $data = $_POST;
 
-            $errors = $this->validateForm($data);
-            $this->session->set('errors', []);
+                // Validation spécifique pour compte secondaire
+                $errors = $this->validateSecondaireForm($data);
+                
+                if (!empty($errors)) {
+                    $this->session->set('errors', $errors);
+                    $this->showNewSecondaire();
+                    return;
+                }
 
-        if (empty($errors)) {
-            $photoPath = $this->uploadPhotos($_FILES);
-            if (!$photoPath) {
-                $this->session->set('errors', ['photoIdentite' => "Erreur lors de l'envoi des photos."]);
-            } else {
-                $userData = $this->buildUserData($data, $photoPath);
+                // Vérifier que l'utilisateur est connecté
+                $userId = $this->session->get('user')['id'] ?? null;
+                if (!$userId) {
+                    $this->session->set('errors', ['compte' => 'Utilisateur non connecté']);
+                    header("Location: " . APP_URL . "/");
+                    exit;
+                }
 
-                $result = $this->securityService->createCompteSecondaire($this->session->get('user')['id'], $data['solde'], $numeroTelephone);
-                if ($result === true) {
-                    header("Location: ".APP_URL."/");
+                $numeroTelephone = $data['telephone']; 
+                $soldeInitial = isset($data['solde']) && $data['solde'] !== '' ? (float)$data['solde'] : 0; 
 
-                    // $twilioService = new TwilioService();
-                    // $message = "Bonjour {$userData['prenom']} {$userData['nom']}, votre compte principal a été  créé avec succès sur Maxit SA}.";
-                    // $smsResult = $twilioService->sendSMS($numeroTelephone, $message);
-
-                    // if ($smsResult !== true) {
-                    //     error_log("Erreur SMS Twilio : " . $smsResult);
-                    // }
-                    // exit;
+                // Appeler le service pour créer le compte secondaire
+                $result = $this->securityService->createCompteSecondaire($userId, $soldeInitial, $numeroTelephone);
+                
+                if ($result === true) 
+                {
+                    $this->session->set('success', 'Compte secondaire créé avec succès !');
+                    // Rediriger vers la même page pour afficher le nouveau compte
+                    header("Location: " . APP_URL . "/newsecondaire");
+                    exit;
                 }
                 else 
                 {
                     $this->session->set('errors', ['compte' => $result]);
                 }
+            } 
+            catch (\Exception $e) 
+            {
+                error_log("Erreur création compte secondaire: " . $e->getMessage());
+                $this->session->set('errors', ['compte' => 'Erreur interne: ' . $e->getMessage()]);
             }
-        } else {
-            $this->session->set('errors', $errors);
         }
+        
+        $this->showNewSecondaire();
     }
-    $this->layout = 'security';
-    $this->renderHtml("compte/newsecondaire.php");
-}
-}
 
-
+    // Afficher la page de création de compte secondaire avec la liste des comptes
+   public function showNewSecondaire()
+{
+    $this->layout = 'base'; 
+    
+    $comptesSecondaires = [];
+    $userId = $this->session->get('user')['id'] ?? null;
+    
+    if ($userId) {
+        $compteRepository = App::getDependencies('CompteRepository');
+        $comptesSecondaires = $compteRepository->getComptesSecondaires($userId);
+    }
+    
+    $this->renderHtml("compte/newsecondaire.php", [
+        'comptesSecondaires' => $comptesSecondaires,
+        'errors' => $this->session->get('errors', []),
+        'success' => $this->session->get('success', '')
+    ]);
+    
+    $this->session->unset('errors');
+    $this->session->unset('success');
+}
+    
+}

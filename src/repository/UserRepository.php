@@ -71,10 +71,15 @@ class UserRepository extends AbstractRepository
       }
       return null;
    }
+   public function selectById($id){
+        $query = "SELECT * FROM {$this->table} WHERE id = :id";
+        $stmt = $this->DB->prepare($query);
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch() ?: null;
+     }
    function selectAll() {}
    function update() {}
    function delete() {}
-   function selectById($id) {}
    function selectBy(array $filter) {}
 }
 
