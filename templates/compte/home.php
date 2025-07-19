@@ -101,12 +101,12 @@
 <body class="font-sans bg-gradient-dark min-h-screen text-white">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar Navigation -->
-        <div class="w-70 bg-white-900 bg-opacity-95 glass-effect border-r border-orange-500 border-opacity-60 p-5 overflow-y-auto transition-all relative" id="sidebar">
+        <div class="w-70 bg-white-900 bg-opacity-95 glass-effect  border-opacity-60 p-5 overflow-y-auto transition-all relative" id="sidebar">
          
         <!-- Main Content -->
         <div class="flex-1 flex overflow-hidden">
             <!-- Dashboard Content -->
-            <div class="flex-1 p-8 overflow-y-auto bg-white bg-opacity-10">
+            <div class="flex-1 p-8 overflow-y-auto bg-white bg-opacity-10 border-l border-orange-500">
                 <!-- Dashboard Screen -->
                 <div id="dashboard" class="screen active">
                     <div class="flex justify-between items-center mb-8 text-white">
@@ -127,7 +127,7 @@
                         <div class="bg-gradient-primary text-white text-center rounded-3xl p-6 shadow-lg hover-lift transition-all glass-effect">
                             <div class="opacity-90 text-lg">Solde du compte principal</div>
                             <div class="text-5xl font-bold my-4"><?php echo $comptes['solde']  ?></div>
-                            <div class="opacity-90 text-lg">Compte: <?php echo $comptes['numero']  ?></div>
+                            <div class="opacity-90 text-lg">Compte numéro: <?php echo $comptes['numero']  ?></div>
                             <div class="flex gap-4 mt-5 flex-wrap">
                                 <button class="flex-1 min-w-32 py-3 px-5 bg-white bg-opacity-20 border-none rounded-2xl text-white cursor-pointer transition-all font-medium hover:bg-opacity-30 hover-lift-small" onclick="showScreen('transfer')">
                                     💸 Transférer
@@ -145,7 +145,7 @@
                             <h3 class="mb-4 text-gray-800 text-xl font-semibold">📊 Statistiques</h3>
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="text-center p-4 bg-primary bg-opacity-10 rounded-xl">
-                                    <div class="text-3xl font-bold text-primary">3</div>
+                                    <div class="text-3xl font-bold text-primary"><?php echo count($comptes); ?></div>
                                     <div class="text-gray-600">Comptes</div>
                                 </div>
                                 <div class="text-center p-4 bg-success bg-opacity-10 rounded-xl">
@@ -158,9 +158,9 @@
                         <div class="bg-white bg-opacity-95 rounded-3xl p-6 shadow-lg hover-lift transition-all glass-effect">
                             <h3 class="mb-4 text-gray-800 text-xl font-semibold">🎯 Actions rapides</h3>
                             <div class="grid gap-3">
-                                <button class="w-full py-3 px-8 bg-primary text-white border-none rounded-full text-base font-medium cursor-pointer transition-all hover:bg-blue-600 hover-lift-small shadow-lg" onclick="showScreen('accounts')">
+                                <a href="/newsecondaire"><button class="w-full py-3 px-8 bg-primary text-white border-none rounded-full text-base font-medium cursor-pointer transition-all hover:bg-blue-600 hover-lift-small shadow-lg" onclick="showScreen('accounts')">
                                     Ajouter un compte
-                                </button>
+                                </button></a>
                                 <button class="w-full py-3 px-8 bg-primary text-white border-none rounded-full text-base font-medium cursor-pointer transition-all hover:bg-blue-600 hover-lift-small shadow-lg" onclick="startScan()">
                                     Scanner un QR Code
                                 </button>
@@ -171,7 +171,7 @@
                     <div class="bg-white bg-opacity-95 rounded-3xl p-6 mb-8 shadow-lg glass-effect">
                         <div class="flex justify-between items-center mb-5">
                             <h3 class="text-xl font-semibold text-gray-800">Dernières transactions</h3>
-                            <a href="#" class="text-primary no-underline font-medium py-2 px-4 rounded-2xl transition-all hover:bg-primary hover:bg-opacity-10" onclick="showScreen('transactions')">Voir tout</a>
+                            <a href="/transactions" class="text-primary no-underline font-medium py-2 px-4 rounded-2xl transition-all hover:bg-primary hover:bg-opacity-10" onclick="showScreen('transactions')">Voir tout</a>
                         </div>
                           <div class="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
                                 <?php if (isset($transactions) && !empty($transactions)): ?>
@@ -201,7 +201,7 @@
                                                     </div>
                                                     <div class="text-gray-600 text-sm">
                                                         <?php 
-                                                        $date = new DateTime($transaction['datetransaction']);
+                                                        $date = new DateTime($transaction['date']);
                                                         $now = new DateTime();
                                                         $diff = $now->diff($date);
                                                         

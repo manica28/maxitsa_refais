@@ -45,6 +45,25 @@ class CompteRepository extends AbstractRepository
 
       }
 
+      public function insertSecondaire($solde){
+        $stmt2= $this->DB->prepare("INSERT INTO $this->table (solde, numero, datecreation, typecompte) 
+                                                          VALUES(:solde, :numero, :datecreation, :typecompte)");
+        $genernum = "COM-" .time();
+        
+        $resultat=$stmt2->execute( 
+        [  'solde' =>$solde,
+                    'numero' => $genernum, 
+                    'datecreation' => date("Y-m-d"),
+                    'typecompte' =>TypeCompte::SECONDAIRE->value,
+                ]
+        );
+        if($resultat)
+        {
+           return (int) $this->DB->lastInsertId();
+        }
+        return false;
+      }
+
       function selectById($id){}
       function selectBy(array $filter) {}
       // pour obtenir les information de l'utilisateur connecté: solde , tel, etc...

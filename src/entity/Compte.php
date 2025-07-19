@@ -13,7 +13,7 @@ class Compte {
     private array $transactions ;
     private NumeroTelephone $num ; 
 
-    function __construct (int $id =0 , int $solde = 0, $numero = "",string $datecreation = '', $typecompte = 1){
+    function __construct (int $id =0 , int $solde = 0, $numero = "",string $datecreation = '', $typecompte=TypeCompte::PRINCIPAL){
 
         $this->id = $id ;
         $this->solde = $solde ;

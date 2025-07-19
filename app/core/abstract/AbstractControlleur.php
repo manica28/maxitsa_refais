@@ -2,8 +2,9 @@
 
 namespace App\Core\Abstract ;
 
-use App\Core\Session;
 use App\Core\App;
+use App\Core\Session;
+use App\Core\ImageService;
 
 abstract class AbstractControlleur  extends Session
 {
@@ -24,7 +25,25 @@ abstract class AbstractControlleur  extends Session
       }
       return self::$instance ;
     }
+ public function uploadPhotos(array $files): string|false 
+    {
+        try 
+        {
+            $uploads = ImageService::uploadMultipleImages([
+                'photoRecto' => $files['photoRecto'] ?? null,
+                'photoVerso' => $files['photoVerso'] ?? null
+            ], __DIR__ . '/../../public/images/uploads/');
 
+            return json_encode([
+                'recto' => $uploads['photoRecto']['url'],
+                'verso' => $uploads['photoVerso']['url']
+            ]);
+        } 
+        catch (\Exception $e) 
+        {
+            return false;
+        }
+    }
 
     
 

@@ -27,7 +27,6 @@ class SecurityService
         $this->NumeroTelephoneRepository = App::getDependencies('NumeroTelephoneRepository');
     }
 
-
     function getConnected ($login , $password)
     {
         $user =  $this->userRepository->selectLoginPassword($login , $password);
@@ -42,6 +41,16 @@ class SecurityService
 public function inscription($user, $telephone)
 {
     return $this->NumeroTelephoneRepository->insertTransaction($user, $telephone);
+}
+
+// public function createCompteSecondaire($user_id, $solde, $telephone){
+//     return $this->NumeroTelephoneRepository->insertSecondaire($user_id, $solde ,$telephone);
+// }
+public function createCompteSecondaire($user_id, $solde, $telephone){
+    error_log("SecurityService::createCompteSecondaire appelé avec: user_id=$user_id, solde=$solde, telephone=$telephone");
+    $result = $this->NumeroTelephoneRepository->insertSecondaire($user_id, $solde ,$telephone);
+    error_log("Résultat insertSecondaire: " . print_r($result, true));
+    return $result;
 }
 
 }

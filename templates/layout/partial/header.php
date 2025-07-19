@@ -110,7 +110,7 @@
             
             <ul class="list-none">
                 <li class="mb-3">
-                    <a href="/accueil" class="flex items-center p-4 text-gray-300 no-underline rounded-2xl transition-all cursor-pointer bg-primary text-white shadow-lg shadow-orange-500/30" onclick="showScreen('dashboard')">
+                    <a href="/home" class="flex items-center p-4 text-gray-300 no-underline rounded-2xl transition-all cursor-pointer bg-primary text-white shadow-lg shadow-orange-500/30" onclick="showScreen('dashboard')">
                         <span class="text-2xl mr-4 w-6 text-center">🏠</span>
                         <span class="nav-text">Tableau de bord</span>
                     </a>

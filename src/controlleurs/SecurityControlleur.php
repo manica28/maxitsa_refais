@@ -45,20 +45,23 @@ class SecurityControlleur extends AbstractControlleur
                     $this->session->set('user',$connect->toArray());
                     header('Location: /home' );
                 } 
-                else{
+                else
+                {
                     $this->validator::addError('identifiants', 'Les identifiants ne correspondent pas');
                      $this->session->set('erreurs', $this->validator::getError());
-
                 }
             }
             $this->session->set('erreurs', $this->validator::getError());
         }
         $this->renderHtml('login/connexion.php' );
     }
-    public function show(){}
+    public function show(){
+        
+    }
     public function edit(){}
     public function store(){}
     public function create(){}
+    
     public function index()
     { require_once '../templates/compte/home.php'; }
 

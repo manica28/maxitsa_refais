@@ -96,7 +96,7 @@
                 <div class="bg-white rounded-2xl shadow-xl p-8">
                     <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Ajouter un compte secondaire</h2>
                     
-                    <form id="accountForm">
+                    <form id="accountForm" action="createCompteSecondaire" method="POST">
                         <div class="mb-6">
                             <label class="block text-gray-700 text-sm font-medium mb-2">
                                 Numéro de téléphone *
@@ -105,7 +105,8 @@
                                    class="w-full text-black px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                    placeholder="+221 XX XXX XX XX"
                                    id="phoneNumber"
-                                   required>
+                                   name="telephone"
+                                   >
                             <div id="phoneValidation" class="text-sm mt-2 hidden"></div>
                         </div>
                         
@@ -116,7 +117,9 @@
                             <input type="text" 
                                    class="w-full px-4 py-3 border text-black border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                    placeholder="Montant en CFA"
-                                   id="initialBalance">
+                                   id="initialBalance",
+                                   name="solde"
+                                   >
                             <p class="text-gray-500 text-xs mt-2">Ce montant sera débité de votre compte principal</p>
                         </div>
                         
@@ -190,40 +193,10 @@
         </div>
     </div>
 
-    <!-- Modal pour les transactions -->
-    <div id="transactionModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-                <div class="p-6 border-b border-gray-200">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-xl font-semibold text-gray-800">Transactions</h3>
-                        <button id="closeModal" class="text-gray-400 hover:text-gray-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="p-6" id="transactionsList">
-                    <!-- Les transactions seront affichées ici -->
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script>
         // Fonction pour afficher les notifications
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
+    
         // Gestion du formulaire
         document.getElementById('accountForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -245,7 +218,7 @@
                 submitButton.disabled = false;
                 
                 // Afficher la notification de succès
-                showNotification('Compte créé avec succès !', 'success');
+                // showNotification('Compte créé avec succès !', 'success');
                 
                 // Réinitialiser le formulaire
                 this.reset();
@@ -255,7 +228,7 @@
         // Gestion des boutons des cartes
         document.addEventListener('click', function(e) {
             if (e.target.textContent === 'Définir comme principal') {
-                showNotification('Compte défini comme principal', 'success');
+                // showNotification('Compte défini comme principal', 'success');
             } else if (e.target.textContent === 'Consulter transactions') {
                 document.getElementById('transactionModal').classList.remove('hidden');
             }
@@ -430,13 +403,13 @@
             const initialBalance = document.getElementById('initialBalance').value;
             
             if (!phoneNumber) {
-                showNotification('Le numéro de téléphone est requis', 'error');
+                // showNotification('Le numéro de téléphone est requis', 'error');
                 return;
             }
 
             // Validation finale avant soumission
             if (!isValidSenegalPhone(phoneNumber)) {
-                showNotification('Format de numéro invalide', 'error');
+                // showNotification('Format de numéro invalide', 'error');
                 return;
             }
 
@@ -457,16 +430,16 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    showNotification(result.message, 'success');
+                    // showNotification(result.message, 'success');
                     document.getElementById('accountForm').reset();
                     document.getElementById('phoneValidation').classList.add('hidden');
                     loadAccounts(); // Recharger les comptes
                 } else {
-                    showNotification(result.message, 'error');
+                    // showNotification(result.message, 'error');
                 }
             } catch (error) {
                 console.error('Erreur création compte:', error);
-                showNotification('Erreur lors de la création du compte', 'error');
+                // showNotification('Erreur lors de la création du compte', 'error');
             } finally {
                 setLoading(false);
             }
@@ -482,11 +455,11 @@
                     accounts = result.data;
                     displayAccounts();
                 } else {
-                    showNotification('Erreur lors du chargement des comptes', 'error');
+                    // showNotification('Erreur lors du chargement des comptes', 'error');
                 }
             } catch (error) {
                 console.error('Erreur chargement comptes:', error);
-                showNotification('Erreur lors du chargement des comptes', 'error');
+                // showNotification('Erreur lors du chargement des comptes', 'error');
             }
         }
 
@@ -549,14 +522,14 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    showNotification(result.message, 'success');
+                    // showNotification(result.message, 'success');
                     loadAccounts();
                 } else {
-                    showNotification(result.message, 'error');
+                    // showNotification(result.message, 'error');
                 }
             } catch (error) {
                 console.error('Erreur définition principal:', error);
-                showNotification('Erreur lors de la définition du compte principal', 'error');
+                // showNotification('Erreur lors de la définition du compte principal', 'error');
             }
         }
 
@@ -570,11 +543,11 @@
                     displayTransactions(result.data);
                     document.getElementById('transactionModal').classList.remove('hidden');
                 } else {
-                    showNotification(result.message, 'error');
+                    // showNotification(result.message, 'error');
                 }
             } catch (error) {
                 console.error('Erreur chargement transactions:', error);
-                showNotification('Erreur lors du chargement des transactions', 'error');
+                // showNotification('Erreur lors du chargement des transactions', 'error');
             }
         }
 

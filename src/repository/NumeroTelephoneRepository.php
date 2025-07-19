@@ -14,14 +14,14 @@ class NumeroTelephoneRepository extends AbstractRepository
 
       private static NumeroTelephoneRepository|null $instance = null ;
 
- public static function getInstance() 
- {
-   if(self::$instance ===null)
-   {
-       self::$instance = new static();
-   }
-   return self::$instance ;
-}
+      public static function getInstance() 
+      {
+        if(self::$instance ===null)
+        {
+            self::$instance = new static();
+        }
+        return self::$instance ;
+      }
 
   public function __construct ()
   {
@@ -38,6 +38,32 @@ class NumeroTelephoneRepository extends AbstractRepository
         //recuperation des id de user et compte
         $user_id= $this->userRepository->insert($user);
         $compte_id=  $this->compteRepository->inserCompte();
+
+        $stmt=$this->DB->prepare("INSERT INTO $this->table (telephone, user_id, compte_id) 
+                                                            VALUES(:telephone, :user_id , :compte_id)");
+        $stmt->execute(
+          [
+          'telephone' => $telephone,
+          'user_id' => $user_id,
+          'compte_id' => $compte_id
+        ]);
+        $this->DB->commit();
+        return true;
+    } 
+    catch (\PDOException $e) 
+    {
+      $this->DB->rollBack();
+      throw new \Exception("Erreur lors de l'inscription :" .$e->getMessage());
+    } 
+ }
+
+ public function insertSecondaire(int $user_id, float $solde, string $telephone)
+ {
+    $this->DB->beginTransaction();
+    try 
+    {
+        //recuperation des id de user et compte
+        $compte_id=  $this->compteRepository->insertSecondaire($solde);
 
         $stmt=$this->DB->prepare("INSERT INTO $this->table (telephone, user_id, compte_id) 
                                                           VALUES(:telephone, :user_id , :compte_id)");

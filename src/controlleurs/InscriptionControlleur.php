@@ -43,47 +43,30 @@ class InscriptionControlleur extends AbstractControlleur
         ]);
         return $this->validator->getError();
     }
-
-    private function buildUserData(array $data, string $photoPath): array {
-    return [
-        'nom' => $data['nom'],
-        'prenom' => $data['prenom'],
-        'login' => $data['login'],
-        'password' => $data['password'],
-        'adresse' => $data['adresse'],
-        'numerocni' => $data['numeroCNI'],
-        'photorecto' => $photoPath,
-        'photoverso' => $photoPath,
-        'profil_id' => 1
-    ];
-}
-    private function uploadPhotos(array $files): string|false 
+    private function buildUserData(array $data, string $photoPath): array 
     {
-        try 
+        return [
+            'nom' => $data['nom'],
+            'prenom' => $data['prenom'],
+            'login' => $data['login'],
+            'password' => $data['password'],
+            'adresse' => $data['adresse'],
+            'numerocni' => $data['numeroCNI'],
+            'photorecto' => $photoPath,
+            'photoverso' => $photoPath,
+            'profil_id' => 1
+        ];
+}
+   
+    // fonction qui crée un compte principal
+    public function createComptePrincipal() 
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') 
         {
-            $uploads = ImageService::uploadMultipleImages([
-                'photoRecto' => $files['photoRecto'] ?? null,
-                'photoVerso' => $files['photoVerso'] ?? null
-            ], __DIR__ . '/../../public/images/uploads/');
-
-            return json_encode([
-                'recto' => $uploads['photoRecto']['url'],
-                'verso' => $uploads['photoVerso']['url']
-            ]);
-        } 
-        catch (\Exception $e) 
-        {
-            return false;
-        }
-    }
-
-    public function createComptePrincipal() {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $data = $_POST;
-        $numeroTelephone = $data['telephone'];    
-        $errors = $this->validateForm($data);
-    $this->session->set('errors', []);
-
+            $data = $_POST;
+            $numeroTelephone = $data['telephone'];    
+            $errors = $this->validateForm($data);
+        $this->session->set('errors', []);
 
         if (empty($errors)) {
             $photoPath = $this->uploadPhotos($_FILES);
@@ -105,18 +88,61 @@ class InscriptionControlleur extends AbstractControlleur
                     // }
                     // exit;
                 }
-                 else {
+                else 
+                {
                     $this->session->set('errors', ['compte' => $result]);
                 }
-
             }
         } else {
             $this->session->set('errors', $errors);
         }
     }
-
     $this->layout = 'security';
     $this->renderHtml("login/inscription.php");
+}
+
+public function createCompteSecondaire() 
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') 
+        {
+            $data = $_POST;
+            $numeroTelephone = $data['telephone']; 
+            
+
+            $errors = $this->validateForm($data);
+            $this->session->set('errors', []);
+
+        if (empty($errors)) {
+            $photoPath = $this->uploadPhotos($_FILES);
+            if (!$photoPath) {
+                $this->session->set('errors', ['photoIdentite' => "Erreur lors de l'envoi des photos."]);
+            } else {
+                $userData = $this->buildUserData($data, $photoPath);
+
+                $result = $this->securityService->createCompteSecondaire($this->session->get('user')['id'], $data['solde'], $numeroTelephone);
+                if ($result === true) {
+                    header("Location: ".APP_URL."/");
+
+                    // $twilioService = new TwilioService();
+                    // $message = "Bonjour {$userData['prenom']} {$userData['nom']}, votre compte principal a été  créé avec succès sur Maxit SA}.";
+                    // $smsResult = $twilioService->sendSMS($numeroTelephone, $message);
+
+                    // if ($smsResult !== true) {
+                    //     error_log("Erreur SMS Twilio : " . $smsResult);
+                    // }
+                    // exit;
+                }
+                else 
+                {
+                    $this->session->set('errors', ['compte' => $result]);
+                }
+            }
+        } else {
+            $this->session->set('errors', $errors);
+        }
+    }
+    $this->layout = 'security';
+    $this->renderHtml("compte/newsecondaire.php");
 }
 }
 

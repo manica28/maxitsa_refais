@@ -50,11 +50,17 @@
                         <label for="firstName" class="block text-sm font-semibold text-black mb-1">Prénom *</label>
                         <input type="text" id="firstName" name="prenom"  placeholder="Votre prénom"
                             class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
+                             <?php if(!empty($_SESSION['errors']['prenom'])) : ?>
+                                    <p class="text-sm text-red-500 font-bold"> <?= $_SESSION['errors']['prenom'] ?> </p>
+                            <?php endif ?>
                     </div>
                     <div>
                         <label for="lastName" class="block text-sm font-semibold text-black mb-1">Nom *</label>
                         <input type="text" id="lastName" name="nom"  placeholder="Votre nom"
                             class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
+                             <?php if(!empty($_SESSION['errors']['nom'])) : ?>
+                                    <p class="text-sm text-red-500 font-bold"> <?= $_SESSION['errors']['nom'] ?> </p>
+                             <?php endif ?>
                     </div>
                 </div>
                     
@@ -62,24 +68,36 @@
                         <label for="lastName" class="block text-sm font-semibold text-black mb-1">Login *</label>
                         <input type="text" id="lastName" name="login"  placeholder="Votre login"
                             class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
+                             <?php if(!empty($_SESSION['errors']['login'])) : ?>
+                                    <p class="text-sm text-red-500 font-bold"> <?= $_SESSION['errors']['login'] ?> </p>
+                                <?php endif ?>
                 </div>
 
                 <div>
                     <label for="phone" class="block text-sm font-semibold text-black mb-1">Numéro de téléphone *</label>
                     <input type="tel" id="phone" name="telephone"  placeholder="+221 XX XXX XX XX"
                         class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
+                         <?php if(!empty($_SESSION['errors']['telephone'])) : ?>
+                                <p class="text-sm text-red-500 font-bold"> <?= $_SESSION['errors']['telephone'] ?> </p>
+                        <?php endif ?>
                 </div>
 
                 <div>
                     <label for="idNumber" class="block text-sm font-semibold text-black mb-1">Numéro de carte d'identité *</label>
                     <input type="text" id="idNumber" name="numeroCNI"  placeholder="Numéro de CNI"
                         class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
+                         <?php if(!empty($_SESSION['errors']['numeroCNI'])) : ?>
+                                    <p class="text-sm text-red-500 font-bold"> <?= $_SESSION['errors']['numeroCNI'] ?> </p>
+                             <?php endif ?>
                 </div>
 
                 <div>
                     <label for="address" class="block text-sm font-semibold text-black mb-1">Adresse *</label>
                     <textarea id="address" name="adresse"  rows="2" placeholder="Votre adresse complète"
                         class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300 resize-none"></textarea>
+                         <?php if(!empty($_SESSION['errors']['adresse'])) : ?>
+                                    <p class="text-sm text-red-500 font-bold"> <?= $_SESSION['errors']['adresse'] ?> </p>
+                             <?php endif ?>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -97,6 +115,9 @@
                                 <input type="file" id="idFront" name="photoRecto" accept="image/*" class="hidden" />
                             </label>
                         </div>
+                         <?php if(!empty($_SESSION['errors']['photoRecto'])) : ?>
+                                    <p class="text-sm text-red-500 font-bold"> <?= $_SESSION['errors']['photoRecto'] ?> </p>
+                             <?php endif ?>
                     </div>
 
                     <div>
@@ -113,6 +134,9 @@
                                 <input type="file" id="idBack" name="photoVerso" accept="image/*" class="hidden"/>
                             </label>
                         </div>
+                         <?php if(!empty($_SESSION['errors']['photoVerso'])) : ?>
+                                    <p class="text-sm text-red-500 font-bold"> <?= $_SESSION['errors']['photoVerso'] ?> </p>
+                             <?php endif ?>
                     </div>
                 </div>
 
@@ -121,6 +145,9 @@
                         <label for="password" class="block text-sm font-semibold text-black mb-1">Mot de passe *</label>
                         <input type="password" id="password" name="password"  placeholder="Choisissez un mot de passe"
                             class="w-full p-2 border-2 border-gray-300 rounded-lg focus-orange hover:border-orange-300 transition duration-300">
+                             <?php if(!empty($_SESSION['errors']['password'])) : ?>
+                                    <p class="text-sm text-red-500 font-bold"> <?= $_SESSION['errors']['password'] ?> </p>
+                             <?php endif ?>
                     </div>
                     <div>
                         <label for="confirmPassword" class="block text-sm font-semibold text-black mb-1">Confirmer le mot de passe *</label>
