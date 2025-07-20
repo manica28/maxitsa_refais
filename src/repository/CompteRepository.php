@@ -49,7 +49,7 @@ class CompteRepository extends AbstractRepository
     {
         $stmt2 = $this->DB->prepare("INSERT INTO $this->table (solde, numero, datecreation, typecompte) 
                                      VALUES(:solde, :numero, :datecreation, :typecompte)");
-        $genernum = "COM-" . time() . "-" . rand(100, 999); // Éviter les doublons
+        $genernum = "COM-" . time() . "-" . rand(100, 999);
         
         $resultat = $stmt2->execute([
             'solde' => $solde,
@@ -67,7 +67,6 @@ class CompteRepository extends AbstractRepository
     function selectById($id){}
     function selectBy(array $filter) {}
 
-    // Pour obtenir les informations de l'utilisateur connecté: solde, tel, etc...
     public function getCompteClient($user_id): array|null
     {
         $sql = "SELECT * FROM compte c 
@@ -94,7 +93,6 @@ class CompteRepository extends AbstractRepository
         return $stmt->fetch() ?: null;
     }
 
-    // Nouvelle méthode pour récupérer les comptes secondaires d'un utilisateur
     public function getComptesSecondaires($userId): array
     {
         $sql = "SELECT c.*, c.numero as numerocompte, nt.telephone as telephone 
@@ -109,16 +107,86 @@ class CompteRepository extends AbstractRepository
         return $stmt->fetchAll() ?: [];
     }
 
-    // Méthode pour vérifier si un utilisateur peut créer un compte secondaire
+    /**
+     * Récupère un compte par son numéro de téléphone
+     */
+    public function getCompteByTelephone($telephone): array|null
+    {
+        $sql = "SELECT c.*, c.numero as numerocompte, nt.telephone as telephone 
+                FROM $this->table c
+                JOIN numerotelephone nt ON nt.compte_id = c.id 
+                WHERE nt.telephone = :telephone 
+                ORDER BY c.datecreation DESC
+                LIMIT 1";
+        
+        $stmt = $this->DB->prepare($sql);
+        $stmt->execute(['telephone' => $telephone]);
+        return $stmt->fetch() ?: null;
+    }
+
+    /**
+     * Récupère un compte par son numéro de compte
+     */
+    public function getCompteByNumero($numero): array|null
+    {
+        $sql = "SELECT c.*, c.numero as numerocompte, nt.telephone as telephone,
+                       u.nom, u.prenom 
+                FROM $this->table c
+                JOIN numerotelephone nt ON nt.compte_id = c.id 
+                JOIN users u ON nt.user_id = u.id 
+                WHERE c.numero = :numero";
+        
+        $stmt = $this->DB->prepare($sql);
+        $stmt->execute(['numero' => $numero]);
+        return $stmt->fetch() ?: null;
+    }
+
+    /**
+     * Récupère le dernier compte secondaire créé pour un utilisateur
+     */
+    public function getLatestCompteSecondaire($userId): array|null
+    {
+        $sql = "SELECT c.*, c.numero as numerocompte, nt.telephone as telephone 
+                FROM $this->table c
+                JOIN numerotelephone nt ON nt.compte_id = c.id 
+                JOIN users u ON nt.user_id = u.id 
+                WHERE c.typecompte = 'secondaire' AND u.id = :user_id 
+                ORDER BY c.id DESC
+                LIMIT 1";
+        
+        $stmt = $this->DB->prepare($sql);
+        $stmt->execute(['user_id' => $userId]);
+        return $stmt->fetch() ?: null;
+    }
+
+    /**
+     * Récupère tous les comptes d'un utilisateur avec leurs détails
+     */
+    public function getAllUserComptesWithDetails($userId): array
+    {
+        $sql = "SELECT c.*, c.numero as numerocompte, nt.telephone as telephone,
+                       CASE 
+                           WHEN c.typecompte = 'principal' THEN 'Compte Principal'
+                           ELSE 'Compte Secondaire'
+                       END as type_libelle
+                FROM $this->table c
+                JOIN numerotelephone nt ON nt.compte_id = c.id 
+                JOIN users u ON nt.user_id = u.id 
+                WHERE u.id = :user_id 
+                ORDER BY CASE WHEN c.typecompte = 'principal' THEN 0 ELSE 1 END, c.datecreation DESC";
+        
+        $stmt = $this->DB->prepare($sql);
+        $stmt->execute(['user_id' => $userId]);
+        return $stmt->fetchAll() ?: [];
+    }
+
     public function canCreateSecondaire($userId): bool
     {
-        // Vérifier qu'il a un compte principal
         $principal = $this->findPrincipalByUserId($userId);
         if (!$principal) {
             return false;
         }
 
-        // Optionnel: limiter le nombre de comptes secondaires
         $sql = "SELECT COUNT(*) as count FROM $this->table c
                 JOIN numerotelephone nt ON nt.compte_id = c.id
                 WHERE nt.user_id = :user_id AND c.typecompte = 'secondaire'";
@@ -127,7 +195,6 @@ class CompteRepository extends AbstractRepository
         $stmt->execute(['user_id' => $userId]);
         $result = $stmt->fetch();
         
-        // Limiter à 5 comptes secondaires par exemple
         return $result['count'] < 5;
     }
 }

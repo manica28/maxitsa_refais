@@ -8,7 +8,7 @@ use App\Core\Abstract\AbstractControlleur;
 
 class InscriptionControlleur extends AbstractControlleur 
 {
-    private SecurityService $securityService ;
+    private SecurityService $securityService;
     private Validator $validator;
 
     function __construct()
@@ -44,13 +44,12 @@ class InscriptionControlleur extends AbstractControlleur
         return $this->validator->getError();
     }
 
-    // Validation spécifique pour les comptes secondaires
     private function validateSecondaireForm(array &$data): array 
     {
         $this->validator->validate($data, 
         [
             'telephone' => ['require', 'isPhone'],
-            'solde' => ['numeric'] // optionnel mais doit être numérique si fourni
+            'solde' => ['numeric']
         ]);
         return $this->validator->getError();
     }
@@ -70,7 +69,6 @@ class InscriptionControlleur extends AbstractControlleur
         ];
     }
    
-    // fonction qui crée un compte principal
     public function createComptePrincipal() 
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') 
@@ -111,11 +109,9 @@ class InscriptionControlleur extends AbstractControlleur
         {
             try 
             {
-                // Nettoyer les erreurs précédentes
                 $this->session->set('errors', []);
                 $data = $_POST;
 
-                // Validation spécifique pour compte secondaire
                 $errors = $this->validateSecondaireForm($data);
                 
                 if (!empty($errors)) {
@@ -124,7 +120,6 @@ class InscriptionControlleur extends AbstractControlleur
                     return;
                 }
 
-                // Vérifier que l'utilisateur est connecté
                 $userId = $this->session->get('user')['id'] ?? null;
                 if (!$userId) {
                     $this->session->set('errors', ['compte' => 'Utilisateur non connecté']);
@@ -135,18 +130,23 @@ class InscriptionControlleur extends AbstractControlleur
                 $numeroTelephone = $data['telephone']; 
                 $soldeInitial = isset($data['solde']) && $data['solde'] !== '' ? (float)$data['solde'] : 0; 
 
-                // Appeler le service pour créer le compte secondaire
+                // Créer le compte secondaire
                 $result = $this->securityService->createCompteSecondaire($userId, $soldeInitial, $numeroTelephone);
                 
-                if ($result === true) 
-                {
+                if (is_array($result)) {
+                    // Succès - le résultat contient les données du nouveau compte
                     $this->session->set('success', 'Compte secondaire créé avec succès !');
-                    // Rediriger vers la même page pour afficher le nouveau compte
+                    $this->session->set('nouveau_compte', $result); // Stocker temporairement les données
+                    
+                    // Optionnel : log pour debug
+                    error_log("Nouveau compte créé: " . print_r($result, true));
+                    
                     header("Location: " . APP_URL . "/newsecondaire");
                     exit;
                 }
                 else 
                 {
+                    // Erreur
                     $this->session->set('errors', ['compte' => $result]);
                 }
             } 
@@ -160,27 +160,90 @@ class InscriptionControlleur extends AbstractControlleur
         $this->showNewSecondaire();
     }
 
-    // Afficher la page de création de compte secondaire avec la liste des comptes
-   public function showNewSecondaire()
-{
-    $this->layout = 'base'; 
-    
-    $comptesSecondaires = [];
-    $userId = $this->session->get('user')['id'] ?? null;
-    
-    if ($userId) {
-        $compteRepository = App::getDependencies('CompteRepository');
-        $comptesSecondaires = $compteRepository->getComptesSecondaires($userId);
+    /**
+     * Afficher la page de création de compte secondaire avec la liste des comptes
+     */
+    public function showNewSecondaire()
+    {
+        $this->layout = 'base'; 
+        
+        $comptesSecondaires = [];
+        $nouveauCompte = null;
+        $userId = $this->session->get('user')['id'] ?? null;
+        
+        if ($userId) {
+            $compteRepository = App::getDependencies('CompteRepository');
+            
+            // Récupérer tous les comptes secondaires
+            $comptesSecondaires = $compteRepository->getComptesSecondaires($userId);
+            
+            // Récupérer le nouveau compte s'il existe
+            $nouveauCompte = $this->session->get('nouveau_compte');
+            if ($nouveauCompte) {
+                // Marquer le nouveau compte pour le mettre en évidence
+                foreach ($comptesSecondaires as &$compte) {
+                    if ($compte['id'] == $nouveauCompte['id']) {
+                        $compte['nouveau'] = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        $this->renderHtml("compte/newsecondaire.php", [
+            'comptesSecondaires' => $comptesSecondaires,
+            'nouveauCompte' => $nouveauCompte,
+            'errors' => $this->session->get('errors', []),
+            'success' => $this->session->get('success', '')
+        ]);
+        
+        // Nettoyer les données de session après affichage
+        $this->session->unset('errors');
+        $this->session->unset('success');
+        $this->session->unset('nouveau_compte');
     }
-    
-    $this->renderHtml("compte/newsecondaire.php", [
-        'comptesSecondaires' => $comptesSecondaires,
-        'errors' => $this->session->get('errors', []),
-        'success' => $this->session->get('success', '')
-    ]);
-    
-    $this->session->unset('errors');
-    $this->session->unset('success');
-}
-    
+
+    // /**
+    //  * API pour récupérer les comptes d'un utilisateur en JSON
+    //  */
+    // public function getComptes()
+    // {
+    //     $userId = $this->session->get('user')['id'] ?? null;
+    //     if (!$userId) {
+    //         http_response_code(401);
+    //         echo json_encode(['error' => 'Utilisateur non connecté']);
+    //         return;
+    //     }
+
+    //     $comptes = $this->securityService->getAllUserComptes($userId);
+        
+    //     header('Content-Type: application/json');
+    //     echo json_encode($comptes);
+    // }
+
+    // /**
+    //  * API pour récupérer un compte par son numéro
+    //  */
+    // public function getCompteByNumero($numero = null)
+    // {
+    //     if (!$numero) {
+    //         $numero = $_GET['numero'] ?? null;
+    //     }
+        
+    //     if (!$numero) {
+    //         http_response_code(400);
+    //         echo json_encode(['error' => 'Numéro de compte requis']);
+    //         return;
+    //     }
+
+    //     $compte = $this->securityService->getCompteByNumero($numero);
+        
+    //     header('Content-Type: application/json');
+    //     if ($compte) {
+    //         echo json_encode($compte);
+    //     } else {
+    //         http_response_code(404);
+    //         echo json_encode(['error' => 'Compte non trouvé']);
+    //     }
+    // }
 }

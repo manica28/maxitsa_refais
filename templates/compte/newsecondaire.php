@@ -177,35 +177,33 @@
                                 <span class="bg-green-500 text-white text-xs px-3 py-1 rounded-full font-medium">Principal</span>
                             </div>
                             <div class="mb-6">
-                                <h3 class="text-xl font-bold mb-2">+221 77 6675550</h3>
-                                <p class="text-2xl font-bold text-white">250 000 CFA</p>
+                                <h3 class="text-xl font-bold mb-2"><?php echo $comptes['telephone'] ?></h3>
+                                <p class="text-2xl font-bold text-white"><?php echo $comptes['solde'] ?></p>
                             </div>
                             <div class="space-y-3">
-                                <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-4 rounded-xl transition duration-200">
+                               <a href="/transactions"> <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-4 rounded-xl transition duration-200">
                                     Consulter transactions
-                                </button>
+                                </button></a>
+
                             </div>
                         </div>
 
                         <!-- Comptes Secondaires -->
-                        <?php if (isset($comptesSecondaires) && !empty($comptesSecondaires)): ?>
-                            <?php foreach ($comptesSecondaires as $compte): ?>
-                                <div class="bg-black text-white rounded-2xl p-6 shadow-xl">
-                                    <div class="mb-6">
-                                        <h3 class="text-xl font-bold mb-2"><?= htmlspecialchars($compte['telephone']) ?></h3>
-                                        <p class="text-2xl font-bold text-white"><?= number_format($compte['solde'], 0, ',', ' ') ?> CFA</p>
-                                    </div>
-                                    <div class="space-y-3">
-                                        <button class="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-4 rounded-xl transition duration-200">
-                                            Définir comme principal
-                                        </button>
-                                        <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-4 rounded-xl transition duration-200">
-                                            Consulter transactions
-                                        </button>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
+                      <?php if (isset($nouveauCompte)): ?>
+    <div class="alert alert-success">
+        <h4>Nouveau compte créé !</h4>
+        <p>Numéro : <?= $nouveauCompte['numerocompte'] ?></p>
+        <p>Téléphone : <?= $nouveauCompte['telephone'] ?></p>
+        <p>Solde : <?= number_format($nouveauCompte['solde'], 0, ',', ' ') ?> CFA</p>
+    </div>
+<?php endif; ?>
+
+<!-- Afficher tous les comptes avec mise en évidence du nouveau -->
+<?php foreach ($comptesSecondaires as $compte): ?>
+    <div class="compte-item <?= isset($compte['nouveau']) ? 'nouveau-compte' : '' ?>">
+        <!-- Affichage du compte -->
+    </div>
+<?php endforeach; ?>
 
                         <!-- Exemple de compte secondaire statique -->
                         <div class="bg-black text-white rounded-2xl p-6 shadow-xl">
@@ -229,7 +227,8 @@
     </div>
 
     <script>
-        document.getElementById('accountForm').addEventListener('submit', function(e) {
+        document.getElementById('accountForm').addEventListener('submit', function(e) 
+        {
             const submitButton = document.getElementById('submitButton');
             const submitText = document.getElementById('submitText');
             const submitLoading = document.getElementById('submitLoading');
