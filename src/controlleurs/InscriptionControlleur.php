@@ -116,7 +116,7 @@ class InscriptionControlleur extends AbstractControlleur
                 
                 if (!empty($errors)) {
                     $this->session->set('errors', $errors);
-                    $this->showNewSecondaire();
+                    // $this->showNewSecondaire();
                     return;
                 }
 
@@ -157,51 +157,72 @@ class InscriptionControlleur extends AbstractControlleur
             }
         }
         
-        $this->showNewSecondaire();
+        // $this->showNewSecondaire();
     }
 
     /**
      * Afficher la page de création de compte secondaire avec la liste des comptes
      */
-    public function showNewSecondaire()
-    {
-        $this->layout = 'base'; 
+
+ 
+public function affichecomptesecondaire($user_id)
+{
+    // Récupérer les comptes secondaires
+    $secondaires = $this->securityService->recupcomptesecondaire($user_id);
+    
+    // Récupérer le compte principal
+    $comptePrincipal = $this->securityService->getAllUserComptes($user_id);
+    
+    // Debug pour voir ce qu'on récupère
+    var_dump("Secondaires:", $secondaires);
+    var_dump("Principal:", $comptePrincipal);
+    
+    $this->renderHtml('compte/newsecondaire.php', [
+        "secondaires" => $secondaires,
+        "principal" => $comptePrincipal
+    ]);
+}
+
+
+    // public function showNewSecondaire()
+    // {
+    //     $this->layout = 'base'; 
         
-        $comptesSecondaires = [];
-        $nouveauCompte = null;
-        $userId = $this->session->get('user')['id'] ?? null;
+    //     $comptesSecondaires = [];
+    //     $nouveauCompte = null;
+    //     $userId = $this->session->get('user')['id'] ?? null;
         
-        if ($userId) {
-            $compteRepository = App::getDependencies('CompteRepository');
+    //     if ($userId) {
+    //         $compteRepository = App::getDependencies('CompteRepository');
             
-            // Récupérer tous les comptes secondaires
-            $comptesSecondaires = $compteRepository->getComptesSecondaires($userId);
+    //         // Récupérer tous les comptes secondaires
+    //         $comptesSecondaires = $compteRepository->getComptesSecondaires($userId);
             
-            // Récupérer le nouveau compte s'il existe
-            $nouveauCompte = $this->session->get('nouveau_compte');
-            if ($nouveauCompte) {
-                // Marquer le nouveau compte pour le mettre en évidence
-                foreach ($comptesSecondaires as &$compte) {
-                    if ($compte['id'] == $nouveauCompte['id']) {
-                        $compte['nouveau'] = true;
-                        break;
-                    }
-                }
-            }
-        }
+    //         // Récupérer le nouveau compte s'il existe
+    //         $nouveauCompte = $this->session->get('nouveau_compte');
+    //         if ($nouveauCompte) {
+    //             // Marquer le nouveau compte pour le mettre en évidence
+    //             foreach ($comptesSecondaires as &$compte) {
+    //                 if ($compte['id'] == $nouveauCompte['id']) {
+    //                     $compte['nouveau'] = true;
+    //                     break;
+    //                 }
+    //             }
+    //         }
+    //     }
         
-        $this->renderHtml("compte/newsecondaire.php", [
-            'comptesSecondaires' => $comptesSecondaires,
-            'nouveauCompte' => $nouveauCompte,
-            'errors' => $this->session->get('errors', []),
-            'success' => $this->session->get('success', '')
-        ]);
+    //     $this->renderHtml("compte/newsecondaire.php", [
+    //         'comptesSecondaires' => $comptesSecondaires,
+    //         'nouveauCompte' => $nouveauCompte,
+    //         'errors' => $this->session->get('errors', []),
+    //         'success' => $this->session->get('success', '')
+    //     ]);
         
-        // Nettoyer les données de session après affichage
-        $this->session->unset('errors');
-        $this->session->unset('success');
-        $this->session->unset('nouveau_compte');
-    }
+    //     // Nettoyer les données de session après affichage
+    //     $this->session->unset('errors');
+    //     $this->session->unset('success');
+    //     $this->session->unset('nouveau_compte');
+    // }
 
     // /**
     //  * API pour récupérer les comptes d'un utilisateur en JSON

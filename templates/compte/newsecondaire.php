@@ -1,3 +1,9 @@
+<?php 
+// Debug - voir ce qui est disponible
+var_dump($secondaires);
+var_dump($principal);
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -83,6 +89,25 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nouveau-compte {
+            border: 3px solid #10b981;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 5px #10b981; }
+            to { box-shadow: 0 0 20px #10b981, 0 0 30px #10b981; }
+        }
+
+        .compte-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .compte-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
@@ -171,55 +196,97 @@
                     <h3 class="text-2xl font-semibold text-gray-800 mb-6">Vos comptes</h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="accountsGrid">
-                        <!-- Compte Principal (exemple) -->
-                        <div class="bg-black text-white rounded-2xl p-6 shadow-xl relative">
+                        <!-- Compte Principal -->
+                        <?php if (isset($comptes) && !empty($comptes)): ?>
+                        <div class="bg-gradient-to-br from-gray-900 to-black text-white rounded-2xl p-6 shadow-xl relative compte-card">
                             <div class="absolute top-4 right-4">
                                 <span class="bg-green-500 text-white text-xs px-3 py-1 rounded-full font-medium">Principal</span>
                             </div>
                             <div class="mb-6">
-                                <h3 class="text-xl font-bold mb-2"><?php echo $comptes['telephone'] ?></h3>
-                                <p class="text-2xl font-bold text-white"><?php echo $comptes['solde'] ?></p>
+                                <h3 class="text-xl font-bold mb-2"><?= htmlspecialchars($comptes['telephone']) ?></h3>
+                                <p class="text-2xl font-bold text-white"><?= number_format($comptes['solde'], 0, ',', ' ') ?> CFA</p>
                             </div>
                             <div class="space-y-3">
-                               <a href="/transactions"> <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-4 rounded-xl transition duration-200">
-                                    Consulter transactions
-                                </button></a>
-
+                               <a href="/transactions" class="block"> 
+                                   <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-4 rounded-xl transition duration-200">
+                                        Consulter transactions
+                                    </button>
+                               </a>
                             </div>
                         </div>
+                        <?php endif; ?>
 
-                        <!-- Comptes Secondaires -->
-                      <?php if (isset($nouveauCompte)): ?>
-    <div class="alert alert-success">
-        <h4>Nouveau compte créé !</h4>
-        <p>Numéro : <?= $nouveauCompte['numerocompte'] ?></p>
-        <p>Téléphone : <?= $nouveauCompte['telephone'] ?></p>
-        <p>Solde : <?= number_format($nouveauCompte['solde'], 0, ',', ' ') ?> CFA</p>
-    </div>
-<?php endif; ?>
-
-<!-- Afficher tous les comptes avec mise en évidence du nouveau -->
-<?php foreach ($comptesSecondaires as $compte): ?>
-    <div class="compte-item <?= isset($compte['nouveau']) ? 'nouveau-compte' : '' ?>">
-        <!-- Affichage du compte -->
-    </div>
-<?php endforeach; ?>
-
-                        <!-- Exemple de compte secondaire statique -->
-                        <div class="bg-black text-white rounded-2xl p-6 shadow-xl">
-                            <div class="mb-6">
-                                <h3 class="text-xl font-bold mb-2">+221 77 4093057</h3>
-                                <p class="text-2xl font-bold text-white">10 000 CFA</p>
+                        <!-- Affichage du nouveau compte créé -->
+                        <?php if (isset($nouveauCompte) && !empty($nouveauCompte)): ?>
+                            <div class="bg-gradient-to-br from-green-800 to-green-900 text-white rounded-2xl p-6 shadow-xl relative compte-card nouveau-compte">
+                                <div class="absolute top-4 right-4">
+                                    <span class="bg-green-400 text-white text-xs px-3 py-1 rounded-full font-medium">Nouveau!</span>
+                                </div>
+                                <div class="mb-6">
+                                    <h3 class="text-xl font-bold mb-2"><?= htmlspecialchars($nouveauCompte['telephone']) ?></h3>
+                                    <p class="text-sm text-green-200 mb-1">N° : <?= htmlspecialchars($nouveauCompte['numero']) ?></p>
+                                    <p class="text-2xl font-bold text-white"><?= number_format(floatval($nouveauCompte['solde']), 0, ',', ' ') ?> CFA</p>
+                                </div>
+                                <div class="space-y-3">
+                                    <button class="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-4 rounded-xl transition duration-200"
+                                            onclick="definirCommePrincipal('<?= $nouveauCompte['numero'] ?>')">
+                                        Définir comme principal
+                                    </button>
+                                    <a href="/transactions?compte=<?= $nouveauCompte['numero'] ?>" class="block">
+                                        <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-4 rounded-xl transition duration-200">
+                                            Consulter transactions
+                                        </button>
+                                    </a>
+                                </div>
                             </div>
-                            <div class="space-y-3">
-                                <button class="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-4 rounded-xl transition duration-200">
-                                    Définir comme principal
-                                </button>
-                                <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-4 rounded-xl transition duration-200">
-                                    Consulter transactions
-                                </button>
+                        <?php endif; ?>
+
+                        <!-- Comptes secondaires existants -->
+                        <?php if (isset($secondaires) && !empty($secondaires)): ?>
+                            <?php foreach ($secondaires as $compte): ?>
+                                <div class="bg-gradient-to-br from-blue-800 to-purple-900 text-white rounded-2xl p-6 shadow-xl relative compte-card">
+                                    <div class="absolute top-4 right-4">
+                                        <span class="bg-blue-500 text-white text-xs px-3 py-1 rounded-full font-medium">Secondaire</span>
+                                    </div>
+                                    <div class="mb-6">
+                                        <h3 class="text-xl font-bold mb-2"><?= htmlspecialchars($compte['telephone']) ?></h3>
+                                        <p class="text-sm text-gray-300 mb-1">N° : <?= htmlspecialchars($compte['numerocompte']) ?></p>
+                                        <p class="text-2xl font-bold text-white"><?= number_format($compte['solde'], 0, ',', ' ') ?> CFA</p>
+                                        <?php if (isset($compte['datecreation'])): ?>
+                                            <p class="text-xs text-gray-400 mt-1">
+                                                Créé le <?= date('d/m/Y', strtotime($compte['datecreation'])) ?>
+                                            </p>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <button class="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-4 rounded-xl transition duration-200"
+                                                onclick="definirCommePrincipal('<?= $compte['numerocompte'] ?>')">
+                                            Définir comme principal
+                                        </button>
+                                        <a href="/transactions?compte=<?= $compte['numerocompte'] ?>" class="block">
+                                            <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-4 rounded-xl transition duration-200">
+                                                Consulter transactions
+                                            </button>
+                                        </a>
+                                        <button class="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-xl transition duration-200 text-sm"
+                                                onclick="supprimerCompte('<?= $compte['numerocompte'] ?>', '<?= $compte['telephone'] ?>')">
+                                            Supprimer compte
+                                        </button>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <!-- Message si aucun compte secondaire -->
+                            <div class="col-span-full text-center py-8">
+                                <div class="bg-gray-100 rounded-2xl p-8">
+                                    <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    <h4 class="text-xl font-semibold text-gray-600 mb-2">Aucun compte secondaire</h4>
+                                    <p class="text-gray-500">Créez votre premier compte secondaire en utilisant le formulaire ci-dessus</p>
+                                </div>
                             </div>
-                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -262,6 +329,22 @@
             }
         });
 
+        // Fonction pour définir un compte comme principal
+        function definirCommePrincipal(numeroCompte) {
+            if (confirm('Êtes-vous sûr de vouloir définir ce compte comme principal ?')) {
+                // Redirection vers l'action de définition du compte principal
+                window.location.href = `/definir-principal?compte=${numeroCompte}`;
+            }
+        }
+
+        // Fonction pour supprimer un compte
+        function supprimerCompte(numeroCompte, telephone) {
+            if (confirm(`Êtes-vous sûr de vouloir supprimer le compte ${telephone} ?`)) {
+                // Redirection vers l'action de suppression
+                window.location.href = `/supprimer-compte?compte=${numeroCompte}`;
+            }
+        }
+
         // Afficher les notifications s'il y en a
         <?php if (isset($success) && !empty($success)): ?>
             showNotification('<?= addslashes($success) ?>', 'success');
@@ -281,6 +364,16 @@
                 notification.classList.remove('show');
             }, 5000);
         }
+
+        // Animation pour les nouveaux comptes
+        document.addEventListener('DOMContentLoaded', function() {
+            const nouveauxComptes = document.querySelectorAll('.nouveau-compte');
+            nouveauxComptes.forEach(compte => {
+                setTimeout(() => {
+                    compte.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 1000);
+            });
+        });
     </script>
 </body>
 </html>

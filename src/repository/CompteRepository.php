@@ -27,6 +27,7 @@ class CompteRepository extends AbstractRepository
     function delete(){}
     function insert(array $array){}
 
+    // insertion de données dans la table compte lors de l'inscription
     public function inserCompte()
     {
         $stmt2 = $this->DB->prepare("INSERT INTO $this->table (solde, numero, datecreation, typecompte) 
@@ -45,6 +46,7 @@ class CompteRepository extends AbstractRepository
         return false;
     }
 
+    // ajout d'un compte secondaire
     public function insertSecondaire($solde)
     {
         $stmt2 = $this->DB->prepare("INSERT INTO $this->table (solde, numero, datecreation, typecompte) 
@@ -66,7 +68,8 @@ class CompteRepository extends AbstractRepository
 
     function selectById($id){}
     function selectBy(array $filter) {}
-
+    
+// fonction qui recupere le compte du client
     public function getCompteClient($user_id): array|null
     {
         $sql = "SELECT * FROM compte c 
@@ -93,20 +96,41 @@ class CompteRepository extends AbstractRepository
         return $stmt->fetch() ?: null;
     }
 
-    public function getComptesSecondaires($userId): array
-    {
-        $sql = "SELECT c.*, c.numero as numerocompte, nt.telephone as telephone 
-                FROM $this->table c
-                JOIN numerotelephone nt ON nt.compte_id = c.id 
-                JOIN users u ON nt.user_id = u.id 
-                WHERE c.typecompte = 'secondaire' AND u.id = :user_id 
-                ORDER BY c.datecreation DESC";
+    // public function getComptesSecondaires($userId): array
+    // {
+    //     $sql = "SELECT c.*, c.numero as numerocompte, nt.telephone as telephone 
+    //             FROM $this->table c
+    //             JOIN numerotelephone nt ON nt.compte_id = c.id 
+    //             JOIN users u ON nt.user_id = u.id 
+    //             WHERE c.typecompte = 'secondaire' AND u.id = :user_id 
+    //             ORDER BY c.datecreation DESC";
         
-        $stmt = $this->DB->prepare($sql);
-        $stmt->execute(['user_id' => $userId]);
-        return $stmt->fetchAll() ?: [];
+    //     $stmt = $this->DB->prepare($sql);
+    //     $stmt->execute(['user_id' => $userId]);
+    //     return $stmt->fetchAll() ?: [];
+    // }
+/**
+ * Récupère tous les comptes secondaires d'un utilisateur
+ */
+public function getComptesSecondaires($userId): array
+{
+    $sql = "SELECT c.*, c.numero as numerocompte, nt.telephone as telephone 
+            FROM $this->table c
+            JOIN numerotelephone nt ON nt.compte_id = c.id 
+            JOIN users u ON nt.user_id = u.id 
+            WHERE c.typecompte = 'secondaire' AND u.id = :user_id 
+            ORDER BY c.datecreation DESC";
+    
+    $stmt = $this->DB->prepare($sql);
+    $executeResult = $stmt->execute(['user_id' => $userId]);
+    
+    if (!$executeResult) {
+        // En cas d'erreur, retourner un tableau vide
+        return [];
     }
-
+    
+    return $stmt->fetchAll() ?: [];
+}
     /**
      * Récupère un compte par son numéro de téléphone
      */

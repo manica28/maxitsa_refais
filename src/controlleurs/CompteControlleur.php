@@ -31,7 +31,11 @@ class CompteControlleur extends AbstractControlleur
         ]);
     }
 
-    public function edit() {}
+    public function edit() 
+    {
+        $this->renderHtml('compte/woyofal.php');
+    }
+    
 
     public function create()
     {
@@ -83,7 +87,12 @@ class CompteControlleur extends AbstractControlleur
         }
     }
 
-    public function store() {}
+    
+
+    public function store() {
+        $this->renderHtml('compte/newtransaction.php');
+
+    }
 
     
 }

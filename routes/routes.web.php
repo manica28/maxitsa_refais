@@ -13,6 +13,8 @@ $routes = [
      '/newsecondaire' => ['controller'=> CompteControlleur::class, 'method'=>'create'],
       '/transactions' => ['controller' => CompteControlleur::class,'method' => 'show'],
       '/createCompte' => ['controller' => InscriptionControlleur::class, 'method' => 'createComptePrincipal'],
-      '/createCompteSecondaire' => ['controller' => InscriptionControlleur::class, 'method' => 'createCompteSecondaire']
+      '/createCompteSecondaire' => ['controller' => InscriptionControlleur::class, 'method' => 'createCompteSecondaire'],
+      '/newtransaction' => ['controller'=> CompteControlleur::class, 'method'=>'store'],
+      '/woyofal'=> ['controller'=> CompteControlleur::class, 'method'=>'edit']
     
 ];

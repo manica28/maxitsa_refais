@@ -46,6 +46,7 @@ class SecurityService
         return $this->NumeroTelephoneRepository->insertTransaction($user, $telephone);
     }
 
+    // recuperer le compte secondaire crée dans le repository
     public function createCompteSecondaire($user_id, $solde, $telephone)
     {
         // Vérifications préliminaires
@@ -124,4 +125,10 @@ class SecurityService
     {
         return $this->compteRepository->getCompteByNumero($numero);
     }
+
+    // recuperer les comptes secondaores
+public function recupcomptesecondaire($user_id) 
+{
+    return $this->compteRepository->getComptesSecondaires($user_id);
+}
 }

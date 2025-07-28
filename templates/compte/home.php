@@ -161,9 +161,16 @@
                                 <a href="/newsecondaire"><button class="w-full py-3 px-8 bg-primary text-white border-none rounded-full text-base font-medium cursor-pointer transition-all hover:bg-blue-600 hover-lift-small shadow-lg" onclick="showScreen('accounts')">
                                     Ajouter un compte
                                 </button></a>
+                                   <a href="/newtransaction"><button class="w-full py-3 px-8 bg-primary text-white border-none rounded-full text-base font-medium cursor-pointer transition-all hover:bg-blue-600 hover-lift-small shadow-lg" onclick="showScreen('accounts')">
+                                    Effectuer une nouvelle transaction
+                                </button></a>
+                                 
                                 <button class="w-full py-3 px-8 bg-primary text-white border-none rounded-full text-base font-medium cursor-pointer transition-all hover:bg-blue-600 hover-lift-small shadow-lg" onclick="startScan()">
                                     Scanner un QR Code
                                 </button>
+                               <a href="/woyofal"> <button class="w-full py-3 px-8 bg-primary text-white border-none rounded-full text-base font-medium cursor-pointer transition-all hover:bg-blue-600 hover-lift-small shadow-lg" onclick="startScan()">
+                                    Acheter un code woyofal 
+                                </button></a>
                             </div>
                         </div>
                     </div>

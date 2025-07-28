@@ -7,63 +7,50 @@ use Dotenv\Dotenv;
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
-class Seeder
-{
-    private static ?\PDO $pdo = null;
+$pdo = new PDO($_ENV['DSN'], $_ENV['DB_USER'], $_ENV['DB_PASSWORD']);
 
-    private static function connect()
-    {
-        if (self::$pdo === null) {
-            self::$pdo = new \PDO(
-                $_ENV['DSN'],
-                $_ENV['DB_USER'],
-                $_ENV['DB_PASSWORD']
-            );
-        }
-    }
+// PROFILS
+$pdo->exec("INSERT INTO profil (libelle) VALUES 
+    ('client'),
+    ('commercial')
+    
+");
 
-    public static function run()
-    {
-        self::connect();
+// USERS
+$pdo->exec("INSERT INTO users (nom, prenom, login, password, adresse, numerocni, photorecto, photoverso, profil_id) VALUES 
+    ('Mbaye', 'Nianga', 'mbaye28', 'passer', 'Dakar', '1234567890123', 'recto.png', 'verso.png', 1),
+    ('Sow', 'Fatou', 'client1', 'passer', 'Thies', '2345678901234', 'recto.png', 'verso.png', 1),
+    ('Diallo', 'Ousmane', 'client2', 'passer', 'Kaolack', '3456789012345', 'recto.png', 'verso.png', 1)
+");
 
-        // 🧹 Nettoyage des tables (⚠ à activer uniquement en développement)
-        self::$pdo->exec("DELETE FROM numerotelephone;");
-        self::$pdo->exec("DELETE FROM transactions;");
-        self::$pdo->exec("DELETE FROM users;");
-        self::$pdo->exec("DELETE FROM compte;");
-        self::$pdo->exec("DELETE FROM profil;");
+// COMPTES
+$pdo->exec("INSERT INTO comptes (solde, numero, datecreation, typecompte) VALUES 
+    (50000, 'CPT001', '2025-01-01', 'courant'),
+    (100000, 'CPT002', '2025-01-02', 'epargne')
+");
 
-        // 🔁 Réinitialisation des séquences auto-incrémentées
-        self::$pdo->exec("ALTER SEQUENCE profil_id_seq RESTART WITH 1;");
-        self::$pdo->exec("ALTER SEQUENCE compte_id_seq RESTART WITH 1;");
-        self::$pdo->exec("ALTER SEQUENCE users_id_seq RESTART WITH 1;");
-        self::$pdo->exec("ALTER SEQUENCE transactions_id_seq RESTART WITH 1;");
-        self::$pdo->exec("ALTER SEQUENCE numerotelephone_id_seq RESTART WITH 1;");
+// NUMEROS
+$pdo->exec("INSERT INTO numerotelephone (telephone, user_id, compte_id) VALUES 
+    ('770000001', 2, 1),
+    ('770000002', 3, 2)
+");
 
-        // ✅ Insertion des données
-        // Profils
-        self::$pdo->exec("INSERT INTO profil (libelle) VALUES 
-            ('client'),
-            ('commercial');");
+// TRANSACTIONS (13 transactions)
+$pdo->exec("
+    INSERT INTO transactions (date, montant, typetransaction, compte_id) VALUES
+    ('2025-07-01 08:00:00', 10000, 'depot', 1),
+    ('2025-07-01 10:00:00', 5000, 'retrait', 1),
+    ('2025-07-02 09:30:00', 15000, 'virement', 1),
+    ('2025-07-02 14:00:00', 2000, 'depot', 2),
+    ('2025-07-03 11:15:00', 10000, 'retrait', 2),
+    ('2025-07-04 16:00:00', 2500, 'depot', 1),
+    ('2025-07-05 09:00:00', 3000, 'retrait', 1),
+    ('2025-07-06 13:00:00', 8000, 'virement', 2),
+    ('2025-07-07 10:45:00', 12000, 'depot', 2),
+    ('2025-07-08 12:30:00', 4000, 'retrait', 1),
+    ('2025-07-09 15:00:00', 7000, 'virement', 2),
+    ('2025-07-10 17:30:00', 9000, 'depot', 1),
+    ('2025-07-11 19:00:00', 1000, 'retrait', 2)
+");
 
-        // Compte
-        self::$pdo->exec("INSERT INTO compte (solde, numero, datecreation, typecompte) VALUES 
-            (200000.00, 'CPT28', '2002-02-28', 'principal');");
-
-        // Utilisateur
-        self::$pdo->exec("INSERT INTO users (nom, prenom, login, password, adresse, numerocni, photorecto, photoverso, profil_id) 
-            VALUES ('Amina', 'Diouf', 'aminata', 'amina1234', 'mariste', '1234567899', NULL, NULL, 1);");
-
-        // Transaction
-        self::$pdo->exec("INSERT INTO transactions (date, montant, typetransaction, compte_id) 
-            VALUES ('2025-07-16 08:30:00', 100000.00, 'depot', 1);");
-
-        // Numéro de téléphone
-        self::$pdo->exec("INSERT INTO numerotelephone (telephone, user_id, compte_id) 
-            VALUES ('771122334', 1, 1);");
-
-        echo "✅ Les données de test ont été insérées avec succès.\n";
-    }
-}
-
-Seeder::run();
+echo "✅ Données insérées avec succès.\n";
