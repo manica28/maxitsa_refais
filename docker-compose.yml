@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: AppWoyofal
+    container_name: Appmaxitsa
     volumes:
       - .:/app
     env_file:
@@ -15,7 +15,7 @@ services:
 
   nginx:
     image: nginx:latest
-    container_name: woyofal_nginx_app
+    container_name: maxit_nginx_app
     ports:
       - "8060:80"
     volumes:
