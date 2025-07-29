@@ -1,34 +1,22 @@
-# Dockerfile
+FROM php:8.2-fpm
 
-FROM php:8.3-fpm
-
+# Install extensions
 RUN apt-get update && apt-get install -y \
-    nginx \
-    supervisor \
-    libpq-dev \
-    libzip-dev \
-    zip unzip \
-    git curl \
-    && docker-php-ext-install pdo pdo_pgsql pgsql
+    libpq-dev unzip curl && \
+    docker-php-ext-install pdo pdo_pgsql
 
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Installer Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www/html
+# Installer les dépendances du projet
+WORKDIR /var/www
+COPY . /var/www
+RUN composer install
 
-COPY . .
+# Droits
+RUN chown -R www-data:www-data /var/www
 
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+EXPOSE 9000
 
-RUN echo "DB_USER=\${DB_USER}" > .env && \
-    echo "DB_PASSWORD=\${DB_PASSWORD}" >> .env && \
-    echo "APP_URL=\${APP_URL}" >> .env && \
-    echo "dsn=\${dsn}" >> .env
-
-COPY nginx.conf /etc/nginx/sites-available/default
-COPY supervisord.conf /etc/supervisord.conf
-
-
-
-EXPOSE 80
-
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+# Démarrer le serveur intégré PHP
+CMD ["php", "-S", "0.0.0.0:8000", "-t", "public"]
